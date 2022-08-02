@@ -8,7 +8,7 @@ interface IERC1155MintableBurnable is IERC1155 {
         address receiver_,
         uint256 tokenId_,
         uint256 amount_
-    ) external returns (bool);
+    ) external;
 
     function burn(
         address payer_,
