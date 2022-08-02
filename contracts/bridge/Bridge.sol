@@ -53,10 +53,23 @@ contract Bridge is
         uint256 tokenId_,
         bytes32 txHash_,
         uint256 txNonce_,
-        bool isWrapped,
+        bool isWrapped_,
         bytes[] calldata signatures_
     ) external override {
-        // TODO
+        bytes32 signHash_ = getERC721SignHash(
+            token_,
+            tokenId_,
+            msg.sender,
+            txHash_,
+            txNonce_,
+            block.chainid,
+            isWrapped_
+        );
+
+        _checkAndUpdateHashes(txHash_, txNonce_);
+        _checkSignatures(signHash_, signatures_);
+
+        _withdrawERC721(token_, tokenId_, msg.sender, isWrapped_);
     }
 
     function withdrawERC1155(
