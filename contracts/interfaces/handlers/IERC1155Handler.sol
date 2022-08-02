@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 interface IERC1155Handler {
-    event DepositedERC721(
+    event DepositedERC1155(
         address token,
         uint256 tokenId,
         uint256 tokenAmount,
