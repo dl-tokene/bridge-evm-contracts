@@ -102,9 +102,19 @@ contract Bridge is
         uint256 amount_,
         bytes32 txHash_,
         uint256 txNonce_,
-        bool isWrapped,
         bytes[] calldata signatures_
     ) external override {
-        // TODO
+        bytes32 signHash_ = getNativeSignHash(
+            amount_,
+            msg.sender,
+            txHash_,
+            txNonce_,
+            block.chainid
+        );
+
+        _checkAndUpdateHashes(txHash_, txNonce_);
+        _checkSignatures(signHash_, signatures_);
+
+        _withdrawNative(amount_, msg.sender);
     }
 }

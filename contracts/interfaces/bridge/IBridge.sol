@@ -31,7 +31,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
         uint256 amount_,
         bytes32 txHash_,
         uint256 txNonce_,
-        bool isWrapped,
+        bool isWrapped_,
         bytes[] calldata signatures_
     ) external;
 
@@ -39,7 +39,6 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
         uint256 amount_,
         bytes32 txHash_,
         uint256 txNonce_,
-        bool isWrapped,
         bytes[] calldata signatures_
     ) external;
 }
