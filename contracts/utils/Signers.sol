@@ -46,10 +46,7 @@ abstract contract Signers is OwnableUpgradeable {
     }
 
     function setSignaturesThreshold(uint256 signaturesThreshold_) public onlyOwner {
-        require(
-            signaturesThreshold_ > 0 && signaturesThreshold_ <= _signers.length(),
-            "Signers: invalid threshold"
-        );
+        require(signaturesThreshold_ > 0, "Signers: invalid threshold");
 
         signaturesThreshold = signaturesThreshold_;
     }

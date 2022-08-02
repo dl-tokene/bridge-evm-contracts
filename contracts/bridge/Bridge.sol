@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+
 import "../interfaces/bridge/IBridge.sol";
 
 import "../handlers/ERC20Handler.sol";
@@ -13,6 +15,7 @@ import "../utils/Hashes.sol";
 
 contract Bridge is
     IBridge,
+    UUPSUpgradeable,
     Signers,
     Hashes,
     ERC20Handler,
@@ -26,6 +29,8 @@ contract Bridge is
     {
         __Signers_init(signers_, signaturesThreshold_);
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function withdrawERC20(
         address token_,
