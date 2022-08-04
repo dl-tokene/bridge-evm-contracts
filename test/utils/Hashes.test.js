@@ -7,9 +7,9 @@ const Hashes = artifacts.require("HashesMock");
 
 Hashes.numberFormat = "BigNumber";
 
-let hashes;
-
 describe("Hashes", () => {
+  let hashes;
+
   beforeEach("setup", async () => {
     hashes = await Hashes.new();
   });
