@@ -49,7 +49,7 @@ describe("Bridge", () => {
     await erc1155.setApprovalForAll(bridge.address, true);
   });
 
-  describe("withdrawERC20", () => {
+  describe("ERC20 flow", () => {
     it("should withdrawERC20", async () => {
       const expectedAmount = wei("100");
       const expectedIsWrapped = true;
@@ -77,7 +77,7 @@ describe("Bridge", () => {
     });
   });
 
-  describe("withdrawERC721", () => {
+  describe("ERC721 flow", () => {
     it("should withdrawERC721", async () => {
       const expectedIsWrapped = true;
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
@@ -102,7 +102,7 @@ describe("Bridge", () => {
     });
   });
 
-  describe("withdrawERC1155", () => {
+  describe("ERC1155 flow", () => {
     it("should withdrawERC1155", async () => {
       const expectedIsWrapped = true;
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
@@ -130,7 +130,7 @@ describe("Bridge", () => {
     });
   });
 
-  describe("withdrawNative", () => {
+  describe("Native flow", () => {
     it("should withdrawNative", async () => {
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
       const hash = web3.utils.soliditySha3({ value: txHash, type: "bytes32" }, { value: txNonce, type: "uint256" });
