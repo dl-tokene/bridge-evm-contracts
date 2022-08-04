@@ -41,14 +41,14 @@ describe("NativeHandler", () => {
   describe("getNativeSignHash", () => {
     it("should encode args", async () => {
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
       let expectedChainId = 31378;
 
       let signHash0 = await handler.getNativeSignHash(
         baseAmount,
         OWNER,
         expectedTxHash,
-        expextedNonce,
+        expectedNonce,
         expectedChainId
       );
 
@@ -58,14 +58,14 @@ describe("NativeHandler", () => {
           { value: baseAmount, type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" }
         )
       );
 
       expectedIsWraped = false;
 
-      let signHash1 = await handler.getNativeSignHash(wei("1"), OWNER, expectedTxHash, expextedNonce, expectedChainId);
+      let signHash1 = await handler.getNativeSignHash(wei("1"), OWNER, expectedTxHash, expectedNonce, expectedChainId);
 
       assert.equal(
         signHash1,
@@ -73,11 +73,31 @@ describe("NativeHandler", () => {
           { value: wei("1"), type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" }
         )
       );
       assert.notEqual(signHash0, signHash1);
+    });
+  });
+
+  describe("withdrawNative", () => {
+    it("should withdraw native", async () => {
+      await handler.depositNative("receiver", "kovan", { value: baseAmount });
+      await handler.withdrawNative(baseAmount, OWNER);
+
+      assert.equal(await web3.eth.getBalance(handler.address), 0);
+    });
+
+    it("should revert when amount is 0", async () => {
+      await truffleAssert.reverts(handler.withdrawNative(0, OWNER), "NativeHandler: amount is zero");
+    });
+
+    it("should revert when receiver address is 0", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawNative(baseAmount, "0x0000000000000000000000000000000000000000"),
+        "NativeHandler: receiver is zero"
+      );
     });
   });
 });
