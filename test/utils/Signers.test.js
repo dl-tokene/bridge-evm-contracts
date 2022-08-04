@@ -74,7 +74,10 @@ describe("Signers", () => {
     });
 
     it("should check signatures", async () => {
+      await signers.addSigners([await accounts(19)]);
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
+      const anotherPrivateKey = Buffer.from(ANOTHER_PRIVATE_KEY, "hex");
+
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
       let expectedNonce = "1794147";
 
@@ -88,9 +91,10 @@ describe("Signers", () => {
         { value: true, type: "bool" }
       );
 
-      let signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
+      let signature1 = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
+      let signature2 = ethSigUtil.personalSign({ privateKey: anotherPrivateKey, data: signHash });
 
-      await truffleAssert.passes(signers.checkSignatures(signHash, [signature]));
+      await truffleAssert.passes(signers.checkSignatures(signHash, [signature1, signature2]));
     });
 
     it("should revert when try duplicate signers", async () => {

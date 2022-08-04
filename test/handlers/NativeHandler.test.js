@@ -97,5 +97,9 @@ describe("NativeHandler", () => {
         "NativeHandler: receiver is zero"
       );
     });
+
+    it("should revert when amount more than balance", async () => {
+      await truffleAssert.reverts(handler.withdrawNative(wei("1000000"), OWNER), "NativeHandler: can't send eth");
+    });
   });
 });
