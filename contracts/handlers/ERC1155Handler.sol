@@ -15,8 +15,8 @@ abstract contract ERC1155Handler is IERC1155Handler, ERC1155Holder {
         string calldata network_,
         bool isWrapped_
     ) external override {
-        require(token_ != address(0), "ERC20Handler: zero token");
-        require(amount_ > 0, "ERC20Handler: amount is zero");
+        require(token_ != address(0), "ERC1155Handler: zero token");
+        require(amount_ > 0, "ERC1155Handler: amount is zero");
 
         IERC1155MintableBurnable erc1155_ = IERC1155MintableBurnable(token_);
 
