@@ -63,8 +63,6 @@ describe("NativeHandler", () => {
         )
       );
 
-      expectedIsWraped = false;
-
       let signHash1 = await handler.getNativeSignHash(wei("1"), OWNER, expectedTxHash, expectedNonce, expectedChainId);
 
       assert.equal(
