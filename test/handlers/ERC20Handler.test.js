@@ -1,7 +1,6 @@
 const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
-const { artifacts, web3 } = require("hardhat");
 
 const ERC20HandlerMock = artifacts.require("ERC20HandlerMock");
 const ERC20Mock = artifacts.require("ERC20Mock");
@@ -10,7 +9,6 @@ ERC20Mock.numberFormat = "BigNumber";
 ERC20HandlerMock.numberFormat = "BigNumber";
 
 describe("ERC20Handler", () => {
-  const OWNER_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
   const baseBalance = wei("1000000");
 
   let OWNER;
@@ -81,7 +79,7 @@ describe("ERC20Handler", () => {
     it("should encode args", async () => {
       let expectedAmount = wei("100");
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
       let expectedChainId = 31378;
       let expectedIsWrapped = true;
 
@@ -90,7 +88,7 @@ describe("ERC20Handler", () => {
         expectedAmount,
         OWNER,
         expectedTxHash,
-        expextedNonce,
+        expectedNonce,
         expectedChainId,
         expectedIsWrapped
       );
@@ -102,7 +100,7 @@ describe("ERC20Handler", () => {
           { value: expectedAmount, type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
           { value: expectedIsWrapped, type: "bool" }
         )
@@ -115,7 +113,7 @@ describe("ERC20Handler", () => {
         expectedAmount,
         OWNER,
         expectedTxHash,
-        expextedNonce,
+        expectedNonce,
         expectedChainId,
         expectedIsWrapped
       );
@@ -127,11 +125,12 @@ describe("ERC20Handler", () => {
           { value: expectedAmount, type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
           { value: expectedIsWrapped, type: "bool" }
         )
       );
+
       assert.notEqual(signHash0, signHash1);
     });
   });

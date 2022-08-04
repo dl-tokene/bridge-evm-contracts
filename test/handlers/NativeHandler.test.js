@@ -12,7 +12,6 @@ describe("NativeHandler", () => {
 
   let OWNER;
   let handler;
-  let token;
 
   before("setup", async () => {
     OWNER = await accounts(0);
@@ -75,6 +74,7 @@ describe("NativeHandler", () => {
           { value: expectedChainId, type: "uint256" }
         )
       );
+
       assert.notEqual(signHash0, signHash1);
     });
   });

@@ -1,7 +1,6 @@
 const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
-const { artifacts, web3 } = require("hardhat");
 const ethSigUtil = require("@metamask/eth-sig-util");
 
 const Signers = artifacts.require("SignersMock");
@@ -77,14 +76,14 @@ describe("Signers", () => {
     it("should check signatures", async () => {
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
 
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
         { value: await accounts(0), type: "address" },
         { value: expectedTxHash, type: "bytes32" },
-        { value: expextedNonce, type: "uint256" },
+        { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
         { value: true, type: "bool" }
       );
@@ -97,14 +96,14 @@ describe("Signers", () => {
     it("should revert when try duplicate signers", async () => {
       const privateKey = Buffer.from(OWNER_PRIVATE_KEY, "hex");
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
 
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
         { value: await accounts(0), type: "address" },
         { value: expectedTxHash, type: "bytes32" },
-        { value: expextedNonce, type: "uint256" },
+        { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
         { value: true, type: "bool" }
       );
@@ -120,14 +119,14 @@ describe("Signers", () => {
     it("should revert when try sign by not signer", async () => {
       const privateKey = Buffer.from(ANOTHER_PRIVATE_KEY, "hex");
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
 
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
         { value: await accounts(0), type: "address" },
         { value: expectedTxHash, type: "bytes32" },
-        { value: expextedNonce, type: "uint256" },
+        { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
         { value: true, type: "bool" }
       );
@@ -140,14 +139,14 @@ describe("Signers", () => {
     it("should revert when try signers < threshold", async () => {
       await signers.setSignaturesThreshold(1);
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
 
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
         { value: await accounts(0), type: "address" },
         { value: expectedTxHash, type: "bytes32" },
-        { value: expextedNonce, type: "uint256" },
+        { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
         { value: true, type: "bool" }
       );
@@ -156,16 +155,15 @@ describe("Signers", () => {
     });
 
     it("should revert when pass incorrect", async () => {
-      const privateKey = Buffer.from(ANOTHER_PRIVATE_KEY, "hex");
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
 
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
         { value: await accounts(0), type: "address" },
         { value: expectedTxHash, type: "bytes32" },
-        { value: expextedNonce, type: "uint256" },
+        { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
         { value: true, type: "bool" }
       );

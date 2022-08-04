@@ -1,7 +1,6 @@
 const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
-const { artifacts, web3 } = require("hardhat");
 
 const ERC721HandlerMock = artifacts.require("ERC721HandlerMock");
 const ERC721Mock = artifacts.require("ERC721Mock");
@@ -116,11 +115,12 @@ describe("ERC721Handler", () => {
           { value: expectedIsWrapped, type: "bool" }
         )
       );
+
       assert.notEqual(signHash0, signHash1);
     });
   });
 
-  describe.only("withdrawERC721", async () => {
+  describe("withdrawERC721", async () => {
     it("should withdraw token, wrapped = true", async () => {
       await handler.depositERC721(token.address, baseId, "receiver", "kovan", true);
       await handler.withdrawERC721(token.address, baseId, OWNER, true);

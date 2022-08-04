@@ -1,7 +1,6 @@
 const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
-const { artifacts, web3 } = require("hardhat");
 
 const ERC1155HandlerMock = artifacts.require("ERC1155HandlerMock");
 const ERC1155Mock = artifacts.require("ERC1155Mock");
@@ -136,6 +135,7 @@ describe("ERC1155Handler", () => {
           { value: expectedIsWrapped, type: "bool" }
         )
       );
+
       assert.notEqual(signHash0, signHash1);
     });
   });
