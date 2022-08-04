@@ -83,7 +83,7 @@ describe("ERC20Handler", () => {
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
       let expextedNonce = "1794147";
       let expectedChainId = 31378;
-      let expectedIsWraped = true;
+      let expectedIsWrapped = true;
 
       let signHash0 = await handler.getERC20SignHash(
         token.address,
@@ -92,7 +92,7 @@ describe("ERC20Handler", () => {
         expectedTxHash,
         expextedNonce,
         expectedChainId,
-        expectedIsWraped
+        expectedIsWrapped
       );
 
       assert.equal(
@@ -104,11 +104,11 @@ describe("ERC20Handler", () => {
           { value: expectedTxHash, type: "bytes32" },
           { value: expextedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
-          { value: expectedIsWraped, type: "bool" }
+          { value: expectedIsWrapped, type: "bool" }
         )
       );
 
-      expectedIsWraped = false;
+      expectedIsWrapped = false;
 
       let signHash1 = await handler.getERC20SignHash(
         token.address,
@@ -117,7 +117,7 @@ describe("ERC20Handler", () => {
         expectedTxHash,
         expextedNonce,
         expectedChainId,
-        expectedIsWraped
+        expectedIsWrapped
       );
 
       assert.equal(
@@ -129,10 +129,46 @@ describe("ERC20Handler", () => {
           { value: expectedTxHash, type: "bytes32" },
           { value: expextedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
-          { value: expectedIsWraped, type: "bool" }
+          { value: expectedIsWrapped, type: "bool" }
         )
       );
       assert.notEqual(signHash0, signHash1);
+    });
+  });
+
+  describe("withdrawERC20", () => {
+    it("should withdraw 100 tokens, is wrapped = true", async () => {
+      let expectedAmount = wei("100");
+
+      await handler.depositERC20(token.address, expectedAmount, "receiver", "kovan", true);
+      await handler.withdrawERC20(token.address, expectedAmount, OWNER, true);
+
+      assert.equal((await token.balanceOf(OWNER)).toFixed(), baseBalance);
+      assert.equal(await token.balanceOf(handler.address), "0");
+    });
+
+    it("should withdraw 52 tokens, is wrapped = false", async () => {
+      let expectedAmount = wei("52");
+
+      await handler.depositERC20(token.address, expectedAmount, "receiver", "kovan", false);
+      await handler.withdrawERC20(token.address, expectedAmount, OWNER, false);
+
+      assert.equal((await token.balanceOf(OWNER)).toFixed(), baseBalance);
+      assert.equal(await token.balanceOf(handler.address), "0");
+    });
+
+    it("should revert when try to withdraw 0 tokens", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawERC20(token.address, "0", OWNER, false),
+        "ERC20Handler: amount is zero"
+      );
+    });
+
+    it("should revert when try token address 0", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawERC20("0x0000000000000000000000000000000000000000", wei("100"), OWNER, false),
+        "ERC20Handler: zero token"
+      );
     });
   });
 });
