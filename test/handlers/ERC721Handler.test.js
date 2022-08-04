@@ -65,18 +65,18 @@ describe("ERC721Handler", () => {
   describe("getERC721SignHash", () => {
     it("should encode args", async () => {
       let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
-      let expextedNonce = "1794147";
+      let expectedNonce = "1794147";
       let expectedChainId = 31378;
-      let expectedIsWraped = true;
+      let expectedIsWrapped = true;
 
       let signHash0 = await handler.getERC721SignHash(
         token.address,
         baseId,
         OWNER,
         expectedTxHash,
-        expextedNonce,
+        expectedNonce,
         expectedChainId,
-        expectedIsWraped
+        expectedIsWrapped
       );
 
       assert.equal(
@@ -86,22 +86,22 @@ describe("ERC721Handler", () => {
           { value: baseId, type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
-          { value: expectedIsWraped, type: "bool" }
+          { value: expectedIsWrapped, type: "bool" }
         )
       );
 
-      expectedIsWraped = false;
+      expectedIsWrapped = false;
 
       let signHash1 = await handler.getERC721SignHash(
         token.address,
         baseId,
         OWNER,
         expectedTxHash,
-        expextedNonce,
+        expectedNonce,
         expectedChainId,
-        expectedIsWraped
+        expectedIsWrapped
       );
 
       assert.equal(
@@ -111,12 +111,42 @@ describe("ERC721Handler", () => {
           { value: baseId, type: "uint256" },
           { value: OWNER, type: "address" },
           { value: expectedTxHash, type: "bytes32" },
-          { value: expextedNonce, type: "uint256" },
+          { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
-          { value: expectedIsWraped, type: "bool" }
+          { value: expectedIsWrapped, type: "bool" }
         )
       );
       assert.notEqual(signHash0, signHash1);
+    });
+  });
+
+  describe.only("withdrawERC721", async () => {
+    it("should withdraw token, wrapped = true", async () => {
+      await handler.depositERC721(token.address, baseId, "receiver", "kovan", true);
+      await handler.withdrawERC721(token.address, baseId, OWNER, true);
+
+      assert.equal(await token.ownerOf(baseId), OWNER);
+    });
+
+    it("should withdraw token, wrapped = false", async () => {
+      await handler.depositERC721(token.address, baseId, "receiver", "kovan", false);
+      await handler.withdrawERC721(token.address, baseId, OWNER, false);
+
+      assert.equal(await token.ownerOf(baseId), OWNER);
+    });
+
+    it("should revert when token address is 0", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawERC721("0x0000000000000000000000000000000000000000", baseId, OWNER, false),
+        "ERC721Handler: zero token"
+      );
+    });
+
+    it("should revert when receiver address is 0", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawERC721(token.address, baseId, "0x0000000000000000000000000000000000000000", false),
+        "ERC721Handler: zero receiver"
+      );
     });
   });
 });
