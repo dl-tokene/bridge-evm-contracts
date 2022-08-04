@@ -170,5 +170,12 @@ describe("ERC20Handler", () => {
         "ERC20Handler: zero token"
       );
     });
+
+    it("should revert when receiver address is 0", async () => {
+      await truffleAssert.reverts(
+        handler.withdrawERC20(token.address, wei("100"), "0x0000000000000000000000000000000000000000", false),
+        "ERC20Handler: zero receiver"
+      );
+    });
   });
 });
