@@ -38,6 +38,7 @@ abstract contract ERC20Handler is IERC20Handler {
     ) internal {
         require(token_ != address(0), "ERC20Handler: zero token");
         require(amount_ > 0, "ERC20Handler: amount is zero");
+        require(receiver_ != address(0), "ERC20Handler: zero receiver");
 
         IERC20MintableBurnable erc20_ = IERC20MintableBurnable(token_);
 
