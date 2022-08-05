@@ -1,6 +1,5 @@
 const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
-const truffleAssert = require("truffle-assertions");
 const ethSigUtil = require("@metamask/eth-sig-util");
 
 const Bridge = artifacts.require("Bridge");
@@ -14,7 +13,6 @@ ERC20Mock.numberFormat = "BigNumber";
 Bridge.numberFormat = "BigNumber";
 
 const OWNER_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-const ANOTHER_PRIVATE_KEY = "df57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
 describe("Bridge", () => {
   const baseBalance = wei("1000");

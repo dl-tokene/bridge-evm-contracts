@@ -1,4 +1,3 @@
-const { assert } = require("chai");
 const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
 
