@@ -6,6 +6,22 @@ import "../handlers/IERC721Handler.sol";
 import "../handlers/IERC1155Handler.sol";
 import "../handlers/INativeHandler.sol";
 
+/**
+ * @notice The Bridge contract
+ *
+ * The Bridge contract acts as a permissioned way of transfering assets (ERC20, ERC721, ERC1155, Native) between
+ * 2 different blockchains.
+ *
+ * In order to correctly use the Bridge, one has to deploy both instances of the contract on the base chain and the
+ * destination chain, as well as setup a trusted backend that will act as a `signer`.
+ *
+ * Each Bridge contract can either give or take the user assets when they want to transfer tokens. Both liquidity pool
+ * and mint-and-burn way of transferring assets are supported.
+ *
+ * IMPORTANT
+ *
+ * All of the signers' addresses must differ in they first (the most significant) 8 bits in order to pass a bloom filtering.
+ */
 interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHandler {
     /**
      * @notice function for withdrawing erc20 tokens

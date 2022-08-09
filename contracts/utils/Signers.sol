@@ -24,12 +24,16 @@ abstract contract Signers is OwnableUpgradeable {
     }
 
     function _checkCorrectSigners(address[] memory signers_) private view {
-        for (uint256 i = 0; i < signers_.length; i++) {
-            for (uint256 j = i + 1; j < signers_.length; j++) {
-                require(signers_[i] != signers_[j], "Signers: duplicate signers");
-            }
+        uint256 bitMap;
 
+        for (uint256 i = 0; i < signers_.length; i++) {
             require(_signers.contains(signers_[i]), "Signers: invalid signer");
+
+            uint256 bitKey = 2**(uint256(uint160(signers_[i])) >> 152);
+
+            require(bitMap & bitKey == 0, "Signers: duplicate signers");
+
+            bitMap |= bitKey;
         }
 
         require(signers_.length >= signaturesThreshold, "Signers: threshold is not met");
