@@ -1,11 +1,11 @@
 const { assert } = require("chai");
-const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
 
 const ERC721HandlerMock = artifacts.require("ERC721HandlerMock");
-const ERC721Mock = artifacts.require("ERC721Mock");
+const ERC721MB = artifacts.require("ERC721MintableBurnable");
 
-ERC721Mock.numberFormat = "BigNumber";
+ERC721MB.numberFormat = "BigNumber";
 ERC721HandlerMock.numberFormat = "BigNumber";
 
 describe("ERC721Handler", () => {
@@ -20,11 +20,13 @@ describe("ERC721Handler", () => {
   });
 
   beforeEach("setup", async () => {
-    token = await ERC721Mock.new("Mock", "MK");
+    token = await ERC721MB.new("Mock", "MK", OWNER);
     handler = await ERC721HandlerMock.new();
 
     await token.mintTo(OWNER, baseId);
     await token.approve(handler.address, baseId);
+
+    await token.transferOwnership(handler.address);
   });
 
   describe("depositERC721", () => {

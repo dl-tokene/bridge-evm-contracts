@@ -3,9 +3,9 @@ const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
 
 const ERC20HandlerMock = artifacts.require("ERC20HandlerMock");
-const ERC20Mock = artifacts.require("ERC20Mock");
+const ERC20MB = artifacts.require("ERC20MintableBurnable");
 
-ERC20Mock.numberFormat = "BigNumber";
+ERC20MB.numberFormat = "BigNumber";
 ERC20HandlerMock.numberFormat = "BigNumber";
 
 describe("ERC20Handler", () => {
@@ -20,11 +20,13 @@ describe("ERC20Handler", () => {
   });
 
   beforeEach("setup", async () => {
-    token = await ERC20Mock.new("Mock", "MK");
+    token = await ERC20MB.new("Mock", "MK", OWNER);
     handler = await ERC20HandlerMock.new();
 
     await token.mintTo(OWNER, baseBalance);
     await token.approve(handler.address, baseBalance);
+
+    await token.transferOwnership(handler.address);
   });
 
   describe("depositERC20", () => {

@@ -1,11 +1,11 @@
 const { assert } = require("chai");
-const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts, wei } = require("../../scripts/helpers/utils");
 const truffleAssert = require("truffle-assertions");
 
 const ERC1155HandlerMock = artifacts.require("ERC1155HandlerMock");
-const ERC1155Mock = artifacts.require("ERC1155Mock");
+const ERC1155MB = artifacts.require("ERC1155MintableBurnable");
 
-ERC1155Mock.numberFormat = "BigNumber";
+ERC1155MB.numberFormat = "BigNumber";
 ERC1155HandlerMock.numberFormat = "BigNumber";
 
 describe("ERC1155Handler", () => {
@@ -21,11 +21,13 @@ describe("ERC1155Handler", () => {
   });
 
   beforeEach("setup", async () => {
-    token = await ERC1155Mock.new("URI");
+    token = await ERC1155MB.new("URI", OWNER);
     handler = await ERC1155HandlerMock.new();
 
     await token.mintTo(OWNER, baseId, baseAmount);
     await token.setApprovalForAll(handler.address, true);
+
+    await token.transferOwnership(handler.address);
   });
 
   describe("depositERC1155", () => {

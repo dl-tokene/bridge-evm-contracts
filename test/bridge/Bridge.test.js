@@ -1,15 +1,15 @@
 const { assert } = require("chai");
-const { toBN, accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts, wei } = require("../../scripts/helpers/utils");
 const ethSigUtil = require("@metamask/eth-sig-util");
 
 const Bridge = artifacts.require("Bridge");
-const ERC20Mock = artifacts.require("ERC20Mock");
-const ERC721Mock = artifacts.require("ERC721Mock");
-const ERC1155Mock = artifacts.require("ERC1155Mock");
+const ERC20MB = artifacts.require("ERC20MintableBurnable");
+const ERC721MB = artifacts.require("ERC721MintableBurnable");
+const ERC1155MB = artifacts.require("ERC1155MintableBurnable");
 
-ERC1155Mock.numberFormat = "BigNumber";
-ERC721Mock.numberFormat = "BigNumber";
-ERC20Mock.numberFormat = "BigNumber";
+ERC1155MB.numberFormat = "BigNumber";
+ERC721MB.numberFormat = "BigNumber";
+ERC20MB.numberFormat = "BigNumber";
 Bridge.numberFormat = "BigNumber";
 
 const OWNER_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -34,17 +34,21 @@ describe("Bridge", () => {
     bridge = await Bridge.new();
     await bridge.__Bridge_init([await accounts(0)], "1");
 
-    erc20 = await ERC20Mock.new("Mock", "MK");
+    erc20 = await ERC20MB.new("Mock", "MK", OWNER);
     await erc20.mintTo(OWNER, baseBalance);
     await erc20.approve(bridge.address, baseBalance);
 
-    erc721 = await ERC721Mock.new("Mock", "MK");
+    erc721 = await ERC721MB.new("Mock", "MK", OWNER);
     await erc721.mintTo(OWNER, baseId);
     await erc721.approve(bridge.address, baseId);
 
-    erc1155 = await ERC1155Mock.new("URI");
+    erc1155 = await ERC1155MB.new("URI", OWNER);
     await erc1155.mintTo(OWNER, baseId, baseBalance);
     await erc1155.setApprovalForAll(bridge.address, true);
+
+    await erc20.transferOwnership(bridge.address);
+    await erc721.transferOwnership(bridge.address);
+    await erc1155.transferOwnership(bridge.address);
   });
 
   describe("ERC20 flow", () => {
