@@ -38,6 +38,7 @@ describe("ERC1155Handler", () => {
       assert.equal(tx.receipt.logs[0].event, "DepositedERC1155");
       assert.equal(tx.receipt.logs[0].args.token, token.address);
       assert.equal(tx.receipt.logs[0].args.tokenId, baseId);
+      assert.equal(tx.receipt.logs[0].args.amount, baseAmount);
       assert.equal(tx.receipt.logs[0].args.receiver, "receiver");
       assert.equal(tx.receipt.logs[0].args.network, "kovan");
       assert.isTrue(tx.receipt.logs[0].args.isWrapped);
@@ -51,6 +52,7 @@ describe("ERC1155Handler", () => {
       assert.equal(tx.receipt.logs[0].event, "DepositedERC1155");
       assert.equal(tx.receipt.logs[0].args.token, token.address);
       assert.equal(tx.receipt.logs[0].args.tokenId, baseId);
+      assert.equal(tx.receipt.logs[0].args.amount, baseAmount);
       assert.equal(tx.receipt.logs[0].args.receiver, "receiver");
       assert.equal(tx.receipt.logs[0].args.network, "kovan");
       assert.isFalse(tx.receipt.logs[0].args.isWrapped);

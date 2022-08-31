@@ -26,7 +26,7 @@ describe("NativeHandler", () => {
 
       assert.equal(await web3.eth.getBalance(handler.address), baseAmount);
       assert.equal(tx.receipt.logs[0].event, "DepositedNative");
-      assert.equal(tx.receipt.logs[0].args.tokenAmount, baseAmount);
+      assert.equal(tx.receipt.logs[0].args.amount, baseAmount);
       assert.equal(tx.receipt.logs[0].args.receiver, "receiver");
       assert.equal(tx.receipt.logs[0].args.network, "kovan");
     });

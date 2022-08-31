@@ -8,7 +8,7 @@ interface IERC1155Handler {
     event DepositedERC1155(
         address token,
         uint256 tokenId,
-        uint256 tokenAmount,
+        uint256 amount,
         string receiver,
         string network,
         bool isWrapped

@@ -5,7 +5,7 @@ interface INativeHandler {
     /**
      * @notice event emits from depositNative function
      */
-    event DepositedNative(uint256 tokenAmount, string receiver, string network);
+    event DepositedNative(uint256 amount, string receiver, string network);
 
     /**
      * @notice function for depositing native currency, emits event DepositedNative
