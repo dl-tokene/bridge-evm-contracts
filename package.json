@@ -13,6 +13,7 @@
     "private-network": "npx hardhat node",
     "private-network-fork": "npx hardhat node --fork https://mainnet.infura.io/v3/$(grep INFURA_KEY .env | cut -d '\"' -f2)",
     "deploy-dev": "npx hardhat run deploy/runners/deployer/migrations.js --network localhost",
+    "deploy-ropsten": "VERIFY=true npx hardhat run deploy/runners/deployer/migrations.js --network ropsten",
     "deploy-rinkeby": "VERIFY=true npx hardhat run deploy/runners/deployer/migrations.js --network rinkeby",
     "deploy-chapel": "VERIFY=true npx hardhat run deploy/runners/deployer/migrations.js --network chapel",
     "deploy-eth-mainnet": "VERIFY=true npx hardhat run deploy/runners/deployer/migrations.js --network eth_mainnet",
