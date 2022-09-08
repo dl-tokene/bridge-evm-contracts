@@ -3,10 +3,9 @@ const { logTransaction } = require("../runners/logger/logger.js");
 const Bridge = artifacts.require("Bridge");
 const ERC1967Proxy = artifacts.require("ERC1967Proxy");
 
-// TODO change parameters
-const OWNER = "0x731eA4FC202700A31f4C7355F4a2eE1fa30B2DbE";
-const validators = [];
-const threshold = 1;
+const OWNER = process.env.BRIDGE_OWNER;
+const validators = process.env.BRIDGE_VALIDATORS.split(",");
+const threshold = parseInt(process.env.BRIDGE_THRESHHOLD, 10);
 
 module.exports = async (deployer) => {
   const bridge = await deployer.deploy(Bridge);
