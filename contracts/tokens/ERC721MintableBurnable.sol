@@ -19,9 +19,10 @@ contract ERC721MintableBurnable is IERC721MintableBurnable, Ownable, ERC721 {
         _mint(receiver_, tokenId_);
     }
 
-    function burn(uint256 tokenId_) external override onlyOwner {
+    function burnFrom(address payer_, uint256 tokenId_) external override onlyOwner {
         require(
-            getApproved(tokenId_) == msg.sender || isApprovedForAll(ownerOf(tokenId_), msg.sender),
+            ownerOf(tokenId_) == payer_ &&
+                (getApproved(tokenId_) == msg.sender || isApprovedForAll(payer_, msg.sender)),
             "ERC721MintableBurnable: not approved"
         );
 

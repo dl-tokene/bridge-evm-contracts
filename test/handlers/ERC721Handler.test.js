@@ -12,11 +12,13 @@ describe("ERC721Handler", () => {
   const baseId = "5000";
 
   let OWNER;
+  let SECOND;
   let handler;
   let token;
 
   before("setup", async () => {
     OWNER = await accounts(0);
+    SECOND = await accounts(1);
   });
 
   beforeEach("setup", async () => {
@@ -48,6 +50,13 @@ describe("ERC721Handler", () => {
 
       await truffleAssert.reverts(
         handler.depositERC721(token.address, baseId, "receiver", "kovan", true),
+        "ERC721MintableBurnable: not approved"
+      );
+    });
+
+    it("should not burn token if it is approved but not owned", async () => {
+      await truffleAssert.reverts(
+        handler.depositERC721(token.address, baseId, "receiver", "kovan", true, { from: SECOND }),
         "ERC721MintableBurnable: not approved"
       );
     });

@@ -19,7 +19,7 @@ contract ERC1155MintableBurnable is IERC1155MintableBurnable, Ownable, ERC1155 {
         _mint(receiver_, tokenId_, amount_, "");
     }
 
-    function burn(
+    function burnFrom(
         address payer_,
         uint256 tokenId_,
         uint256 amount_
