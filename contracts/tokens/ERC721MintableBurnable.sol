@@ -24,7 +24,7 @@ contract ERC721MintableBurnable is IERC721MintableBurnable, Ownable, ERC721URISt
         uint256 tokenId_,
         string calldata tokenURI_
     ) external override onlyOwner {
-        _mint(receiver_, tokenId_);
+        _safeMint(receiver_, tokenId_);
         if (bytes(tokenURI_).length > 0) {
             _setTokenURI(tokenId_, tokenURI_);
         }
