@@ -35,6 +35,7 @@ contract Bridge is
     function withdrawERC20(
         address token_,
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         bool isWrapped_,
@@ -43,7 +44,7 @@ contract Bridge is
         bytes32 signHash_ = getERC20SignHash(
             token_,
             amount_,
-            msg.sender,
+            receiver_,
             txHash_,
             txNonce_,
             block.chainid,
@@ -53,12 +54,13 @@ contract Bridge is
         _checkAndUpdateHashes(txHash_, txNonce_);
         _checkSignatures(signHash_, signatures_);
 
-        _withdrawERC20(token_, amount_, msg.sender, isWrapped_);
+        _withdrawERC20(token_, amount_, receiver_, isWrapped_);
     }
 
     function withdrawERC721(
         address token_,
         uint256 tokenId_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         string calldata tokenURI_,
@@ -68,7 +70,7 @@ contract Bridge is
         bytes32 signHash_ = getERC721SignHash(
             token_,
             tokenId_,
-            msg.sender,
+            receiver_,
             txHash_,
             txNonce_,
             block.chainid,
@@ -79,13 +81,14 @@ contract Bridge is
         _checkAndUpdateHashes(txHash_, txNonce_);
         _checkSignatures(signHash_, signatures_);
 
-        _withdrawERC721(token_, tokenId_, msg.sender, tokenURI_, isWrapped_);
+        _withdrawERC721(token_, tokenId_, receiver_, tokenURI_, isWrapped_);
     }
 
     function withdrawERC1155(
         address token_,
         uint256 tokenId_,
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         string calldata tokenURI_,
@@ -96,7 +99,7 @@ contract Bridge is
             token_,
             tokenId_,
             amount_,
-            msg.sender,
+            receiver_,
             txHash_,
             txNonce_,
             block.chainid,
@@ -107,18 +110,19 @@ contract Bridge is
         _checkAndUpdateHashes(txHash_, txNonce_);
         _checkSignatures(signHash_, signatures_);
 
-        _withdrawERC1155(token_, tokenId_, amount_, msg.sender, tokenURI_, isWrapped_);
+        _withdrawERC1155(token_, tokenId_, amount_, receiver_, tokenURI_, isWrapped_);
     }
 
     function withdrawNative(
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         bytes[] calldata signatures_
     ) external override {
         bytes32 signHash_ = getNativeSignHash(
             amount_,
-            msg.sender,
+            receiver_,
             txHash_,
             txNonce_,
             block.chainid
@@ -127,6 +131,6 @@ contract Bridge is
         _checkAndUpdateHashes(txHash_, txNonce_);
         _checkSignatures(signHash_, signatures_);
 
-        _withdrawNative(amount_, msg.sender);
+        _withdrawNative(amount_, receiver_);
     }
 }

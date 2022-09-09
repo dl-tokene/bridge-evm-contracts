@@ -71,7 +71,7 @@ describe("Bridge", () => {
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositERC20(erc20.address, expectedAmount, "receiver", "kovan", true);
-      await bridge.withdrawERC20(erc20.address, expectedAmount, txHash, txNonce, expectedIsWrapped, [signature]);
+      await bridge.withdrawERC20(erc20.address, expectedAmount, OWNER, txHash, txNonce, expectedIsWrapped, [signature]);
 
       assert.equal((await erc20.balanceOf(OWNER)).toFixed(), baseBalance);
       assert.equal(await erc20.balanceOf(bridge.address), "0");
@@ -99,7 +99,9 @@ describe("Bridge", () => {
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositERC721(erc721.address, baseId, "receiver", "kovan", expectedIsWrapped);
-      await bridge.withdrawERC721(erc721.address, baseId, txHash, txNonce, tokenURI, expectedIsWrapped, [signature]);
+      await bridge.withdrawERC721(erc721.address, baseId, OWNER, txHash, txNonce, tokenURI, expectedIsWrapped, [
+        signature,
+      ]);
 
       assert.equal(await erc721.ownerOf(baseId), OWNER);
       assert.isTrue(await bridge.usedHashes(hash));
@@ -126,9 +128,17 @@ describe("Bridge", () => {
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositERC1155(erc1155.address, baseId, baseBalance, "receiver", "kovan", expectedIsWrapped);
-      await bridge.withdrawERC1155(erc1155.address, baseId, baseBalance, txHash, txNonce, tokenURI, expectedIsWrapped, [
-        signature,
-      ]);
+      await bridge.withdrawERC1155(
+        erc1155.address,
+        baseId,
+        baseBalance,
+        OWNER,
+        txHash,
+        txNonce,
+        tokenURI,
+        expectedIsWrapped,
+        [signature]
+      );
 
       assert.equal((await erc1155.balanceOf(OWNER, baseId)).toFixed(), baseBalance);
       assert.isTrue(await bridge.usedHashes(hash));
@@ -144,7 +154,7 @@ describe("Bridge", () => {
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositNative("receiver", "kovan", { value: baseBalance });
-      await bridge.withdrawNative(baseBalance, txHash, txNonce, [signature]);
+      await bridge.withdrawNative(baseBalance, OWNER, txHash, txNonce, [signature]);
 
       assert.equal(await web3.eth.getBalance(bridge.address), 0);
       assert.isTrue(await bridge.usedHashes(hash));

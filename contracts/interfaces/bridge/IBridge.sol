@@ -27,6 +27,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
      * @notice function for withdrawing erc20 tokens
      * @param token_ the address of withdrawn token
      * @param amount_ the amount of withdrawn tokens
+     * @param receiver_ the address of withdraw receiver
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
      * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
@@ -35,6 +36,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
     function withdrawERC20(
         address token_,
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         bool isWrapped_,
@@ -45,6 +47,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
      * @notice function for withdrawing erc721 tokens
      * @param token_ the address of withdrawn token
      * @param tokenId_ the id of withdrawn token
+     * @param receiver_ the address of withdraw receiver
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
      * @param tokenURI_ the string URI to token metadata
@@ -54,6 +57,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
     function withdrawERC721(
         address token_,
         uint256 tokenId_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         string calldata tokenURI_,
@@ -66,6 +70,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
      * @param token_ the address of withdrawn token
      * @param tokenId_ the id of withdrawn token
      * @param amount_ the amount of withdrawn tokens
+     * @param receiver_ the address of withdraw receiver
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
      * @param tokenURI_ the string URI to token metadata
@@ -76,6 +81,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
         address token_,
         uint256 tokenId_,
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         string calldata tokenURI_,
@@ -86,12 +92,14 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
     /**
      * @notice function for withdrawing native currency
      * @param amount_ the amount of withdrawn native currency
+     * @param receiver_ the address of withdraw receiver
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
      * @param signatures_ the array of signatures. Formed by signing a sign hash by each signer.
      */
     function withdrawNative(
         uint256 amount_,
+        address receiver_,
         bytes32 txHash_,
         uint256 txNonce_,
         bytes[] calldata signatures_
