@@ -44,6 +44,15 @@ describe("ERC1155Handler", () => {
       assert.isTrue(tx.receipt.logs[0].args.isWrapped);
     });
 
+    it("should not burn tokens if they are not approved", async () => {
+      await token.setApprovalForAll(handler.address, false);
+
+      await truffleAssert.reverts(
+        handler.depositERC1155(token.address, baseId, baseAmount, "receiver", "kovan", true),
+        "ERC1155MintableBurnable: not approved"
+      );
+    });
+
     it("should deposit token, isWrapped = false", async () => {
       let tx = await handler.depositERC1155(token.address, baseId, baseAmount, "receiver", "kovan", false);
 

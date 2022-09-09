@@ -43,6 +43,15 @@ describe("ERC721Handler", () => {
       await truffleAssert.reverts(token.ownerOf(baseId), "ERC721: owner query for nonexistent token");
     });
 
+    it("should not burn token if it is not approved", async () => {
+      await token.approve(token.address, baseId);
+
+      await truffleAssert.reverts(
+        handler.depositERC721(token.address, baseId, "receiver", "kovan", true),
+        "ERC721MintableBurnable: not approved"
+      );
+    });
+
     it("should deposit token, isWrapped = false", async () => {
       let tx = await handler.depositERC721(token.address, baseId, "receiver", "kovan", false);
 
