@@ -19,7 +19,7 @@ abstract contract ERC721Handler is IERC721Handler, ERC721Holder {
         IERC721MintableBurnable erc721_ = IERC721MintableBurnable(token_);
 
         if (isWrapped_) {
-            erc721_.burn(tokenId_);
+            erc721_.burnFrom(msg.sender, tokenId_);
         } else {
             erc721_.safeTransferFrom(msg.sender, address(this), tokenId_);
         }

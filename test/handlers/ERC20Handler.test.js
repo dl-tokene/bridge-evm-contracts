@@ -45,6 +45,17 @@ describe("ERC20Handler", () => {
       assert.isTrue(tx.receipt.logs[0].args.isWrapped);
     });
 
+    it("should not burn tokens if they are not approved", async () => {
+      let expectedAmount = wei("100");
+
+      await token.approve(handler.address, 0);
+
+      await truffleAssert.reverts(
+        handler.depositERC20(token.address, expectedAmount, "receiver", "kovan", true),
+        "ERC20: insufficient allowance"
+      );
+    });
+
     it("should deposit 52 tokens, isWrapped = false", async () => {
       let expectedAmount = wei("52");
 
