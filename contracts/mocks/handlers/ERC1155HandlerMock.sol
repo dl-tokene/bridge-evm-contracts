@@ -9,8 +9,9 @@ contract ERC1155HandlerMock is ERC1155Handler {
         uint256 tokenId_,
         uint256 amount_,
         address receiver_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) external {
-        _withdrawERC1155(token_, tokenId_, amount_, receiver_, isWrapped_);
+        _withdrawERC1155(token_, tokenId_, amount_, receiver_, tokenURI_, isWrapped_);
     }
 }

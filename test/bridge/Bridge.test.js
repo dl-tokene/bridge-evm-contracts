@@ -17,6 +17,7 @@ const OWNER_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784
 describe("Bridge", () => {
   const baseBalance = wei("1000");
   const baseId = "5000";
+  const tokenURI = "https://some.link";
   const txHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
   const txNonce = "1794147";
 
@@ -38,12 +39,12 @@ describe("Bridge", () => {
     await erc20.mintTo(OWNER, baseBalance);
     await erc20.approve(bridge.address, baseBalance);
 
-    erc721 = await ERC721MB.new("Mock", "MK", OWNER);
-    await erc721.mintTo(OWNER, baseId);
+    erc721 = await ERC721MB.new("Mock", "MK", OWNER, "");
+    await erc721.mintTo(OWNER, baseId, tokenURI);
     await erc721.approve(bridge.address, baseId);
 
-    erc1155 = await ERC1155MB.new("URI", OWNER);
-    await erc1155.mintTo(OWNER, baseId, baseBalance);
+    erc1155 = await ERC1155MB.new("Mock", "MK", "URI", OWNER);
+    await erc1155.mintTo(OWNER, baseId, baseBalance, tokenURI);
     await erc1155.setApprovalForAll(bridge.address, true);
 
     await erc20.transferOwnership(bridge.address);
@@ -92,12 +93,13 @@ describe("Bridge", () => {
         txHash,
         txNonce,
         await web3.eth.getChainId(),
+        tokenURI,
         expectedIsWrapped
       );
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositERC721(erc721.address, baseId, "receiver", "kovan", expectedIsWrapped);
-      await bridge.withdrawERC721(erc721.address, baseId, txHash, txNonce, expectedIsWrapped, [signature]);
+      await bridge.withdrawERC721(erc721.address, baseId, txHash, txNonce, tokenURI, expectedIsWrapped, [signature]);
 
       assert.equal(await erc721.ownerOf(baseId), OWNER);
       assert.isTrue(await bridge.usedHashes(hash));
@@ -118,12 +120,13 @@ describe("Bridge", () => {
         txHash,
         txNonce,
         await web3.eth.getChainId(),
+        tokenURI,
         expectedIsWrapped
       );
       const signature = ethSigUtil.personalSign({ privateKey: privateKey, data: signHash });
 
       await bridge.depositERC1155(erc1155.address, baseId, baseBalance, "receiver", "kovan", expectedIsWrapped);
-      await bridge.withdrawERC1155(erc1155.address, baseId, baseBalance, txHash, txNonce, expectedIsWrapped, [
+      await bridge.withdrawERC1155(erc1155.address, baseId, baseBalance, txHash, txNonce, tokenURI, expectedIsWrapped, [
         signature,
       ]);
 

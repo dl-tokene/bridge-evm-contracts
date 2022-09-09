@@ -34,6 +34,7 @@ abstract contract ERC1155Handler is IERC1155Handler, ERC1155Holder {
         uint256 tokenId_,
         uint256 amount_,
         address receiver_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) internal {
         require(token_ != address(0), "ERC1155Handler: zero token");
@@ -43,7 +44,7 @@ abstract contract ERC1155Handler is IERC1155Handler, ERC1155Holder {
         IERC1155MintableBurnable erc1155_ = IERC1155MintableBurnable(token_);
 
         if (isWrapped_) {
-            erc1155_.mintTo(receiver_, tokenId_, amount_);
+            erc1155_.mintTo(receiver_, tokenId_, amount_, tokenURI_);
         } else {
             erc1155_.safeTransferFrom(address(this), receiver_, tokenId_, amount_, "");
         }
@@ -57,6 +58,7 @@ abstract contract ERC1155Handler is IERC1155Handler, ERC1155Holder {
         bytes32 txHash_,
         uint256 txNonce_,
         uint256 chainId_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) public pure returns (bytes32) {
         return
@@ -69,6 +71,7 @@ abstract contract ERC1155Handler is IERC1155Handler, ERC1155Holder {
                     txHash_,
                     txNonce_,
                     chainId_,
+                    tokenURI_,
                     isWrapped_
                 )
             );

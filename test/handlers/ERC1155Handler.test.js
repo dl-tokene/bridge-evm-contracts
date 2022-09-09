@@ -11,6 +11,7 @@ ERC1155HandlerMock.numberFormat = "BigNumber";
 describe("ERC1155Handler", () => {
   const baseAmount = "10";
   const baseId = "5000";
+  const tokenURI = "https://some.link";
 
   let OWNER;
   let handler;
@@ -21,10 +22,10 @@ describe("ERC1155Handler", () => {
   });
 
   beforeEach("setup", async () => {
-    token = await ERC1155MB.new("URI", OWNER);
+    token = await ERC1155MB.new("Mock", "MK", "URI", OWNER);
     handler = await ERC1155HandlerMock.new();
 
-    await token.mintTo(OWNER, baseId, baseAmount);
+    await token.mintTo(OWNER, baseId, baseAmount, tokenURI);
     await token.setApprovalForAll(handler.address, true);
 
     await token.transferOwnership(handler.address);
@@ -96,6 +97,7 @@ describe("ERC1155Handler", () => {
         expectedTxHash,
         expectedNonce,
         expectedChainId,
+        tokenURI,
         expectedIsWrapped
       );
 
@@ -109,6 +111,7 @@ describe("ERC1155Handler", () => {
           { value: expectedTxHash, type: "bytes32" },
           { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
+          { value: tokenURI, type: "string" },
           { value: expectedIsWrapped, type: "bool" }
         )
       );
@@ -123,6 +126,7 @@ describe("ERC1155Handler", () => {
         expectedTxHash,
         expectedNonce,
         expectedChainId,
+        tokenURI,
         expectedIsWrapped
       );
 
@@ -136,6 +140,7 @@ describe("ERC1155Handler", () => {
           { value: expectedTxHash, type: "bytes32" },
           { value: expectedNonce, type: "uint256" },
           { value: expectedChainId, type: "uint256" },
+          { value: tokenURI, type: "string" },
           { value: expectedIsWrapped, type: "bool" }
         )
       );
@@ -144,10 +149,10 @@ describe("ERC1155Handler", () => {
     });
   });
 
-  describe("withdrawERC721", () => {
+  describe("withdrawERC1155", () => {
     it("should withdraw 100 tokens, wrapped = true", async () => {
       await handler.depositERC1155(token.address, baseId, baseAmount, "receiver", "kovan", true);
-      await handler.withdrawERC1155(token.address, baseId, baseAmount, OWNER, true);
+      await handler.withdrawERC1155(token.address, baseId, baseAmount, OWNER, tokenURI, true);
 
       assert.equal(await token.balanceOf(OWNER, baseId), baseAmount);
       assert.equal(await token.balanceOf(handler.address, baseId), "0");
@@ -155,7 +160,7 @@ describe("ERC1155Handler", () => {
 
     it("should withdraw 52 tokens, wrapped = false", async () => {
       await handler.depositERC1155(token.address, baseId, baseAmount, "receiver", "kovan", false);
-      await handler.withdrawERC1155(token.address, baseId, baseAmount, OWNER, false);
+      await handler.withdrawERC1155(token.address, baseId, baseAmount, OWNER, tokenURI, false);
 
       assert.equal(await token.balanceOf(OWNER, baseId), baseAmount);
       assert.equal(await token.balanceOf(handler.address, baseId), "0");
@@ -163,21 +168,35 @@ describe("ERC1155Handler", () => {
 
     it("should revert when token address is 0", async () => {
       await truffleAssert.reverts(
-        handler.withdrawERC1155("0x0000000000000000000000000000000000000000", baseId, baseAmount, OWNER, true),
+        handler.withdrawERC1155(
+          "0x0000000000000000000000000000000000000000",
+          baseId,
+          baseAmount,
+          OWNER,
+          tokenURI,
+          true
+        ),
         "ERC1155Handler: zero token"
       );
     });
 
     it("should revert when amount is 0", async () => {
       await truffleAssert.reverts(
-        handler.withdrawERC1155(token.address, baseId, 0, OWNER, true),
+        handler.withdrawERC1155(token.address, baseId, 0, OWNER, tokenURI, true),
         "ERC1155Handler: amount is zero"
       );
     });
 
     it("should revert when receiver address is 0", async () => {
       await truffleAssert.reverts(
-        handler.withdrawERC1155(token.address, baseId, baseAmount, "0x0000000000000000000000000000000000000000", true),
+        handler.withdrawERC1155(
+          token.address,
+          baseId,
+          baseAmount,
+          "0x0000000000000000000000000000000000000000",
+          tokenURI,
+          true
+        ),
         "ERC1155Handler: zero receiver"
       );
     });

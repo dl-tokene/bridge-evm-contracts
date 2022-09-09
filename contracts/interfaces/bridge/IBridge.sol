@@ -47,6 +47,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
      * @param tokenId_ the id of withdrawn token
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
+     * @param tokenURI_ the string URI to token metadata
      * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
      * @param signatures_ the array of signatures. Formed by signing a sign hash by each signer.
      */
@@ -55,6 +56,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
         uint256 tokenId_,
         bytes32 txHash_,
         uint256 txNonce_,
+        string calldata tokenURI_,
         bool isWrapped_,
         bytes[] calldata signatures_
     ) external;
@@ -66,6 +68,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
      * @param amount_ the amount of withdrawn tokens
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
+     * @param tokenURI_ the string URI to token metadata
      * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
      * @param signatures_ the array of signatures. Formed by signing a sign hash by each signer.
      */
@@ -75,6 +78,7 @@ interface IBridge is IERC20Handler, IERC721Handler, IERC1155Handler, INativeHand
         uint256 amount_,
         bytes32 txHash_,
         uint256 txNonce_,
+        string calldata tokenURI_,
         bool isWrapped_,
         bytes[] calldata signatures_
     ) external;

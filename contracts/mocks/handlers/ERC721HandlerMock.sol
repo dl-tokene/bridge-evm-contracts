@@ -8,8 +8,9 @@ contract ERC721HandlerMock is ERC721Handler {
         address token_,
         uint256 tokenId_,
         address receiver_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) external {
-        _withdrawERC721(token_, tokenId_, receiver_, isWrapped_);
+        _withdrawERC721(token_, tokenId_, receiver_, tokenURI_, isWrapped_);
     }
 }

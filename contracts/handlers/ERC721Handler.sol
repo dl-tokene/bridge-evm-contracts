@@ -31,6 +31,7 @@ abstract contract ERC721Handler is IERC721Handler, ERC721Holder {
         address token_,
         uint256 tokenId_,
         address receiver_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) internal {
         require(token_ != address(0), "ERC721Handler: zero token");
@@ -39,7 +40,7 @@ abstract contract ERC721Handler is IERC721Handler, ERC721Holder {
         IERC721MintableBurnable erc721_ = IERC721MintableBurnable(token_);
 
         if (isWrapped_) {
-            erc721_.mintTo(receiver_, tokenId_);
+            erc721_.mintTo(receiver_, tokenId_, tokenURI_);
         } else {
             erc721_.safeTransferFrom(address(this), receiver_, tokenId_);
         }
@@ -52,6 +53,7 @@ abstract contract ERC721Handler is IERC721Handler, ERC721Holder {
         bytes32 txHash_,
         uint256 txNonce_,
         uint256 chainId_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) public pure returns (bytes32) {
         return
@@ -63,6 +65,7 @@ abstract contract ERC721Handler is IERC721Handler, ERC721Holder {
                     txHash_,
                     txNonce_,
                     chainId_,
+                    tokenURI_,
                     isWrapped_
                 )
             );

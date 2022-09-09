@@ -37,6 +37,7 @@ interface IERC721Handler {
      * @param txHash_ the hash of deposit tranaction
      * @param txNonce_ the nonce of deposit transaction
      * @param chainId_ the id of chain
+     * @param tokenURI_ the string URI to token metadata
      * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
      * @return bytes32 keccak256(abi.encodePacked(token_,tokenId_,receiver_,txHash_,txNonce_,chainId_,isWrapped_));
      */
@@ -47,6 +48,7 @@ interface IERC721Handler {
         bytes32 txHash_,
         uint256 txNonce_,
         uint256 chainId_,
+        string calldata tokenURI_,
         bool isWrapped_
     ) external pure returns (bytes32);
 }
