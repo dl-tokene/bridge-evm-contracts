@@ -71,6 +71,8 @@ module.exports = {
       mainnet: `${process.env.ETHERSCAN_KEY}`,
       ropsten: `${process.env.ETHERSCAN_KEY}`,
       rinkeby: `${process.env.ETHERSCAN_KEY}`,
+      goerli: `${process.env.ETHERSCAN_KEY}`,
+      sepolia: `${process.env.ETHERSCAN_KEY}`,
       bsc: `${process.env.BSCSCAN_KEY}`,
       bscTestnet: `${process.env.BSCSCAN_KEY}`,
     },
