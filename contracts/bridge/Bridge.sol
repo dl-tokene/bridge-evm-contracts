@@ -133,4 +133,8 @@ contract Bridge is
 
         _withdrawNative(amount_, receiver_);
     }
+
+    function addHash(bytes32 txHash_, uint256 txNonce_) external onlyOwner {
+        _checkAndUpdateHashes(txHash_, txNonce_);
+    }
 }
