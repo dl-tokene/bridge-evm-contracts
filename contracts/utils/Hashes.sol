@@ -11,4 +11,9 @@ abstract contract Hashes {
 
         usedHashes[nonceHash_] = true;
     }
+
+    function containsHash(bytes32 txHash_, uint256 txNonce_) external view returns (bool) {
+        bytes32 nonceHash_ = keccak256(abi.encodePacked(txHash_, txNonce_));
+        return usedHashes[nonceHash_];
+    }
 }
