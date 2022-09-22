@@ -18,8 +18,9 @@ contract ERC1155MintableBurnable is IERC1155MintableBurnable, Ownable, ERC1155UR
     ) ERC1155(uri_) {
         name = name_;
         symbol = symbol_;
-        transferOwnership(owner_);
+
         _setBaseURI(uri_);
+        transferOwnership(owner_);
     }
 
     function mintTo(
@@ -29,6 +30,7 @@ contract ERC1155MintableBurnable is IERC1155MintableBurnable, Ownable, ERC1155UR
         string calldata tokenURI_
     ) external override onlyOwner {
         _mint(receiver_, tokenId_, amount_, "");
+
         if (bytes(tokenURI_).length > 0) {
             _setURI(tokenId_, tokenURI_);
         }
