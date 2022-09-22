@@ -22,6 +22,8 @@ describe("Hashes", () => {
       let hash = web3.utils.soliditySha3({ value: txHash, type: "bytes32" }, { value: txNonce, type: "uint256" });
 
       assert.isTrue(await hashes.usedHashes(hash));
+      assert.isTrue(await hashes.containsHash(txHash, txNonce));
+      assert.isFalse(await hashes.containsHash(txHash, txNonce + 1));
     });
 
     it("should revert when try add hash twice", async () => {

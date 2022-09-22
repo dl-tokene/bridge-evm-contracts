@@ -160,4 +160,16 @@ describe("Bridge", () => {
       assert.isTrue(await bridge.usedHashes(hash));
     });
   });
+
+  describe("add hash", () => {
+    it("should add hash", async () => {
+      const hash = web3.utils.soliditySha3({ value: txHash, type: "bytes32" }, { value: txNonce, type: "uint256" });
+
+      assert.isFalse(await bridge.usedHashes(hash));
+
+      await bridge.addHash(txHash, txNonce);
+
+      assert.isTrue(await bridge.usedHashes(hash));
+    });
+  });
 });
