@@ -14,6 +14,8 @@ abstract contract NativeHandler is INativeHandler {
         emit DepositedNative(msg.value, receiver_, network_);
     }
 
+    receive() external payable {}
+
     function _withdrawNative(uint256 amount_, address receiver_) internal {
         require(amount_ > 0, "NativeHandler: amount is zero");
         require(receiver_ != address(0), "NativeHandler: receiver is zero");
