@@ -19,6 +19,10 @@ function typechainTarget() {
   return target == "" || target == undefined ? "ethers-v5" : target;
 }
 
+function forceTypechain() {
+  return process.env.TYPECHAIN_FORCE == "true";
+}
+
 module.exports = {
   networks: {
     hardhat: {
@@ -37,7 +41,7 @@ module.exports = {
     },
     sepolia: {
       url: `https://sepolia.infura.io/v3/${process.env.INFURA_KEY}`,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: privateKey(),
       gasMultiplier: 1.2,
       timeout: 60000,
     },
@@ -96,6 +100,6 @@ module.exports = {
     target: typechainTarget(),
     alwaysGenerateOverloads: true,
     discriminateTypes: true,
-    dontOverrideCompile: true,
+    dontOverrideCompile: true & !forceTypechain(),
   },
 };
