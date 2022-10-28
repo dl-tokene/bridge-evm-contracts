@@ -1,5 +1,5 @@
 const { assert } = require("chai");
-const { accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts, wei } = require("../../scripts/utils/utils");
 const truffleAssert = require("truffle-assertions");
 
 const NativeHandlerMock = artifacts.require("NativeHandlerMock");

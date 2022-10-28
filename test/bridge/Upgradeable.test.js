@@ -1,4 +1,4 @@
-const { accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts, wei } = require("../../scripts/utils/utils");
 const truffleAssert = require("truffle-assertions");
 
 const ERC1967Proxy = artifacts.require("ERC1967ProxyMock");

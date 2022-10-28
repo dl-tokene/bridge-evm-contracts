@@ -1,6 +1,7 @@
 const { assert } = require("chai");
-const { accounts, wei } = require("../../scripts/helpers/utils");
+const { accounts, wei } = require("../../scripts/utils/utils");
 const ethSigUtil = require("@metamask/eth-sig-util");
+const truffleAssert = require("truffle-assertions");
 
 const Bridge = artifacts.require("Bridge");
 const ERC20MB = artifacts.require("ERC20MintableBurnable");
@@ -21,19 +22,22 @@ describe("Bridge", () => {
   const txHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
   const txNonce = "1794147";
 
-  let bridge;
   let OWNER;
+  let SECOND;
+
+  let bridge;
   let erc20;
   let erc721;
   let erc1155;
 
   before("setup", async () => {
     OWNER = await accounts(0);
+    SECOND = await accounts(1);
   });
 
   beforeEach("setup", async () => {
     bridge = await Bridge.new();
-    await bridge.__Bridge_init([await accounts(0)], "1");
+    await bridge.__Bridge_init([OWNER], "1");
 
     erc20 = await ERC20MB.new("Mock", "MK", OWNER);
     await erc20.mintTo(OWNER, baseBalance);
@@ -50,6 +54,27 @@ describe("Bridge", () => {
     await erc20.transferOwnership(bridge.address);
     await erc721.transferOwnership(bridge.address);
     await erc1155.transferOwnership(bridge.address);
+  });
+
+  describe("access", () => {
+    it("should not initialize twice", async () => {
+      await truffleAssert.reverts(bridge.__Bridge_init([OWNER], "1"), "Initializable: contract is already initialized");
+    });
+
+    it("only owner should call these functions", async () => {
+      await truffleAssert.reverts(erc20.mintTo(OWNER, 1), "Ownable: caller is not the owner");
+      await truffleAssert.reverts(erc721.mintTo(OWNER, 1, ""), "Ownable: caller is not the owner");
+      await truffleAssert.reverts(erc1155.mintTo(OWNER, 1, 1, ""), "Ownable: caller is not the owner");
+
+      await truffleAssert.reverts(erc20.burnFrom(OWNER, 1), "Ownable: caller is not the owner");
+      await truffleAssert.reverts(erc721.burnFrom(OWNER, 1), "Ownable: caller is not the owner");
+      await truffleAssert.reverts(erc1155.burnFrom(OWNER, 1, 1), "Ownable: caller is not the owner");
+
+      await truffleAssert.reverts(
+        bridge.addHash(txHash, txNonce, { from: SECOND }),
+        "Ownable: caller is not the owner"
+      );
+    });
   });
 
   describe("ERC20 flow", () => {

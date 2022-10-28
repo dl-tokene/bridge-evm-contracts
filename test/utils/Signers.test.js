@@ -1,5 +1,5 @@
 const { assert } = require("chai");
-const { accounts } = require("../../scripts/helpers/utils");
+const { accounts } = require("../../scripts/utils/utils");
 const truffleAssert = require("truffle-assertions");
 const ethSigUtil = require("@metamask/eth-sig-util");
 
@@ -11,11 +11,36 @@ const OWNER_PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784
 const ANOTHER_PRIVATE_KEY = "df57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e";
 
 describe("Signers", () => {
+  let OWNER;
+  let SECOND;
+  let THIRD;
+
   let signers;
+
+  before("setup", async () => {
+    OWNER = await accounts(0);
+    SECOND = await accounts(1);
+    THIRD = await accounts(2);
+  });
 
   beforeEach("setup", async () => {
     signers = await Signers.new();
-    await signers.__SignersMock_init([await accounts(0)], "1");
+    await signers.__SignersMock_init([OWNER], "1");
+  });
+
+  describe("access", () => {
+    it("should not initialize twice", async () => {
+      await truffleAssert.reverts(signers.__Signers_init([OWNER], "1"), "Initializable: contract is not initializing");
+    });
+
+    it("only owner should call these functions", async () => {
+      await truffleAssert.reverts(
+        signers.setSignaturesThreshold(1, { from: SECOND }),
+        "Ownable: caller is not the owner"
+      );
+      await truffleAssert.reverts(signers.addSigners([OWNER], { from: SECOND }), "Ownable: caller is not the owner");
+      await truffleAssert.reverts(signers.removeSigners([OWNER], { from: SECOND }), "Ownable: caller is not the owner");
+    });
   });
 
   describe("setSignaturesThreshold", () => {
@@ -39,7 +64,7 @@ describe("Signers", () => {
 
   describe("addSigners", () => {
     it("should add signers", async () => {
-      let expectedSigners = [await accounts(0), await accounts(1), await accounts(2)];
+      let expectedSigners = [OWNER, SECOND, THIRD];
 
       await signers.addSigners(expectedSigners);
 
@@ -47,7 +72,7 @@ describe("Signers", () => {
     });
 
     it("should revert when try add zero address signer", async () => {
-      let expectedSigners = [await accounts(0), "0x0000000000000000000000000000000000000000", await accounts(2)];
+      let expectedSigners = [OWNER, "0x0000000000000000000000000000000000000000", THIRD];
 
       await truffleAssert.reverts(signers.addSigners(expectedSigners), "Signers: zero signer");
     });
@@ -55,13 +80,13 @@ describe("Signers", () => {
 
   describe("removeSigners", () => {
     it("should remove signers", async () => {
-      let signersToAdd = [await accounts(0), await accounts(1), await accounts(2)];
-      let signersToRemove = [await accounts(0), await accounts(2)];
+      let signersToAdd = [OWNER, SECOND, THIRD];
+      let signersToRemove = [OWNER, THIRD];
 
       await signers.addSigners(signersToAdd);
       await signers.removeSigners(signersToRemove);
 
-      assert.deepEqual(await signers.getSigners(), [await accounts(1)]);
+      assert.deepEqual(await signers.getSigners(), [SECOND]);
     });
   });
 
@@ -69,7 +94,7 @@ describe("Signers", () => {
     let signersToAdd;
 
     beforeEach("", async () => {
-      signersToAdd = [await accounts(0), await accounts(1), await accounts(2)];
+      signersToAdd = [OWNER, SECOND, THIRD];
       await signers.addSigners(signersToAdd);
     });
 
@@ -84,7 +109,7 @@ describe("Signers", () => {
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
-        { value: await accounts(0), type: "address" },
+        { value: OWNER, type: "address" },
         { value: expectedTxHash, type: "bytes32" },
         { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
@@ -105,7 +130,7 @@ describe("Signers", () => {
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
-        { value: await accounts(0), type: "address" },
+        { value: OWNER, type: "address" },
         { value: expectedTxHash, type: "bytes32" },
         { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
@@ -128,7 +153,7 @@ describe("Signers", () => {
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
-        { value: await accounts(0), type: "address" },
+        { value: OWNER, type: "address" },
         { value: expectedTxHash, type: "bytes32" },
         { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
@@ -148,7 +173,7 @@ describe("Signers", () => {
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
-        { value: await accounts(0), type: "address" },
+        { value: OWNER, type: "address" },
         { value: expectedTxHash, type: "bytes32" },
         { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },
@@ -165,7 +190,7 @@ describe("Signers", () => {
       let signHash = web3.utils.soliditySha3(
         { value: "0x76e98f7d84603AEb97cd1c89A80A9e914f181679", type: "address" },
         { value: "1", type: "uint256" },
-        { value: await accounts(0), type: "address" },
+        { value: OWNER, type: "address" },
         { value: expectedTxHash, type: "bytes32" },
         { value: expectedNonce, type: "uint256" },
         { value: "98", type: "uint256" },

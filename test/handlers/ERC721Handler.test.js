@@ -1,5 +1,5 @@
 const { assert } = require("chai");
-const { accounts } = require("../../scripts/helpers/utils");
+const { accounts } = require("../../scripts/utils/utils");
 const truffleAssert = require("truffle-assertions");
 
 const ERC721HandlerMock = artifacts.require("ERC721HandlerMock");
@@ -48,6 +48,13 @@ describe("ERC721Handler", () => {
         assert.isTrue(tx.receipt.logs[0].args.isWrapped);
 
         await truffleAssert.reverts(token.ownerOf(baseId), "ERC721: owner query for nonexistent token");
+      });
+
+      it("should deposit token, isWrapped = true (2)", async () => {
+        await token.approve("0x0000000000000000000000000000000000000000", baseId);
+        await token.setApprovalForAll(handler.address, true);
+
+        await truffleAssert.passes(handler.depositERC721(token.address, baseId, "receiver", "kovan", true), "pass");
       });
 
       it("should not burn token if it is not approved", async () => {
