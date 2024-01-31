@@ -7,11 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/tokens/IERC20MintableBurnable.sol";
 
 contract ERC20MintableBurnable is IERC20MintableBurnable, Ownable, ERC20 {
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        address owner_
-    ) ERC20(name_, symbol_) {
+    constructor(string memory name_, string memory symbol_, address owner_) ERC20(name_, symbol_) {
         transferOwnership(owner_);
     }
 
