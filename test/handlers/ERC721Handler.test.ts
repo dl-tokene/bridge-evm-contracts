@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
-import { Reverter } from "@test-helpers";
+import { ERC721BridgingType, Reverter } from "@test-helpers";
 
 import { ERC721HandlerMock, ERC721MintableBurnable } from "@ethers-v6";
 
@@ -40,8 +40,8 @@ describe("ERC721Handler", () => {
 
   describe("ERC721 no base uri", () => {
     describe("depositERC721", () => {
-      it("should deposit token, isWrapped = true", async () => {
-        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", true);
+      it("should deposit token, operationType = Wrapped", async () => {
+        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", ERC721BridgingType.Wrapped);
 
         const depositEvent = (await handler.queryFilter(handler.filters.DepositedERC721, -1))[0];
 
@@ -50,47 +50,56 @@ describe("ERC721Handler", () => {
         expect(depositEvent.args.tokenId).to.be.equal(baseId);
         expect(depositEvent.args.receiver).to.be.equal("receiver");
         expect(depositEvent.args.network).to.be.equal("kovan");
-        expect(depositEvent.args.isWrapped).to.be.true;
+        expect(depositEvent.args.operationType).to.be.equal(ERC721BridgingType.Wrapped);
 
         await expect(token.ownerOf(baseId)).to.be.rejectedWith("ERC721: owner query for nonexistent token");
       });
 
-      it("should deposit token, isWrapped = true (2)", async () => {
+      it("should deposit token, operationType = Wrapped (2)", async () => {
         await token.approve(ethers.ZeroAddress, baseId);
         await token.setApprovalForAll(await handler.getAddress(), true);
 
-        await expect(handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", true)).to.be
-          .eventually.fulfilled;
+        await expect(
+          handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", ERC721BridgingType.Wrapped),
+        ).to.be.eventually.fulfilled;
       });
 
       it("should not burn token if it is not approved", async () => {
         await token.approve(ethers.ZeroAddress, baseId);
 
         await expect(
-          handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", true),
+          handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", ERC721BridgingType.Wrapped),
         ).to.be.rejectedWith("ERC721MintableBurnable: not approved");
       });
 
       it("should not burn token if it is approved but not owned", async () => {
         await expect(
-          handler.connect(SECOND).depositERC721(await token.getAddress(), baseId, "receiver", "kovan", true),
+          handler
+            .connect(SECOND)
+            .depositERC721(await token.getAddress(), baseId, "receiver", "kovan", ERC721BridgingType.Wrapped),
         ).to.be.rejectedWith("ERC721MintableBurnable: not approved");
       });
 
-      it("should deposit token, isWrapped = false", async () => {
-        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", false);
+      it("should deposit token, operationType = LiquidityPool", async () => {
+        await handler.depositERC721(
+          await token.getAddress(),
+          baseId,
+          "receiver",
+          "kovan",
+          ERC721BridgingType.LiquidityPool,
+        );
 
         const depositEvent = (await handler.queryFilter(handler.filters.DepositedERC721, -1))[0];
 
-        expect(depositEvent.args.isWrapped).to.be.false;
+        expect(depositEvent.args.operationType).to.be.equal(ERC721BridgingType.LiquidityPool);
 
         expect(await token.tokenURI(baseId)).to.be.equal(tokenURI);
       });
 
       it("should revert when token address is 0", async () => {
-        await expect(handler.depositERC721(ethers.ZeroAddress, baseId, "receiver", "kovan", false)).to.be.rejectedWith(
-          "ERC721Handler: zero token",
-        );
+        await expect(
+          handler.depositERC721(ethers.ZeroAddress, baseId, "receiver", "kovan", ERC721BridgingType.LiquidityPool),
+        ).to.be.rejectedWith("ERC721Handler: zero token");
       });
     });
 
@@ -99,7 +108,7 @@ describe("ERC721Handler", () => {
         let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
         let expectedNonce = "1794147";
         let expectedChainId = 31378;
-        let expectedIsWrapped = true;
+        let expectedOperationType = ERC721BridgingType.Wrapped;
 
         let signHash0 = await handler.getERC721SignHash(
           await token.getAddress(),
@@ -109,13 +118,13 @@ describe("ERC721Handler", () => {
           expectedNonce,
           expectedChainId,
           tokenURI,
-          expectedIsWrapped,
+          expectedOperationType,
         );
 
         expect(signHash0).to.be.equal(
           ethers.keccak256(
             ethers.solidityPacked(
-              ["address", "uint256", "address", "bytes32", "uint256", "uint256", "string", "bool"],
+              ["address", "uint256", "address", "bytes32", "uint256", "uint256", "string", "uint8"],
               [
                 await token.getAddress(),
                 baseId,
@@ -124,13 +133,13 @@ describe("ERC721Handler", () => {
                 expectedNonce,
                 expectedChainId,
                 tokenURI,
-                expectedIsWrapped,
+                expectedOperationType,
               ],
             ),
           ),
         );
 
-        expectedIsWrapped = false;
+        expectedOperationType = ERC721BridgingType.LiquidityPool;
 
         let signHash1 = await handler.getERC721SignHash(
           await token.getAddress(),
@@ -140,13 +149,13 @@ describe("ERC721Handler", () => {
           expectedNonce,
           expectedChainId,
           tokenURI,
-          expectedIsWrapped,
+          expectedOperationType,
         );
 
         expect(signHash1).to.be.equal(
           ethers.keccak256(
             ethers.solidityPacked(
-              ["address", "uint256", "address", "bytes32", "uint256", "uint256", "string", "bool"],
+              ["address", "uint256", "address", "bytes32", "uint256", "uint256", "string", "uint8"],
               [
                 await token.getAddress(),
                 baseId,
@@ -155,7 +164,7 @@ describe("ERC721Handler", () => {
                 expectedNonce,
                 expectedChainId,
                 tokenURI,
-                expectedIsWrapped,
+                expectedOperationType,
               ],
             ),
           ),
@@ -166,30 +175,48 @@ describe("ERC721Handler", () => {
     });
 
     describe("withdrawERC721", async () => {
-      it("should withdraw token, wrapped = true", async () => {
-        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", true);
-        await handler.withdrawERC721(await token.getAddress(), baseId, OWNER, tokenURI, true);
+      it("should withdraw token, operationType = Wrapped", async () => {
+        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", ERC721BridgingType.Wrapped);
+        await handler.withdrawERC721(await token.getAddress(), baseId, OWNER, tokenURI, ERC721BridgingType.Wrapped);
 
         expect(await token.ownerOf(baseId)).to.be.equal(OWNER.address);
         expect(await token.tokenURI(baseId)).to.be.equal(tokenURI);
       });
 
-      it("should withdraw token, wrapped = false", async () => {
-        await handler.depositERC721(await token.getAddress(), baseId, "receiver", "kovan", false);
-        await handler.withdrawERC721(await token.getAddress(), baseId, OWNER, tokenURI, false);
+      it("should withdraw token, operationType = LiquidityPool", async () => {
+        await handler.depositERC721(
+          await token.getAddress(),
+          baseId,
+          "receiver",
+          "kovan",
+          ERC721BridgingType.LiquidityPool,
+        );
+        await handler.withdrawERC721(
+          await token.getAddress(),
+          baseId,
+          OWNER,
+          tokenURI,
+          ERC721BridgingType.LiquidityPool,
+        );
 
         expect(await token.ownerOf(baseId)).to.be.equal(OWNER.address);
       });
 
       it("should revert when token address is 0", async () => {
-        await expect(handler.withdrawERC721(ethers.ZeroAddress, baseId, OWNER, tokenURI, false)).to.be.rejectedWith(
-          "ERC721Handler: zero token",
-        );
+        await expect(
+          handler.withdrawERC721(ethers.ZeroAddress, baseId, OWNER, tokenURI, ERC721BridgingType.LiquidityPool),
+        ).to.be.rejectedWith("ERC721Handler: zero token");
       });
 
       it("should revert when receiver address is 0", async () => {
         await expect(
-          handler.withdrawERC721(await token.getAddress(), baseId, ethers.ZeroAddress, tokenURI, false),
+          handler.withdrawERC721(
+            await token.getAddress(),
+            baseId,
+            ethers.ZeroAddress,
+            tokenURI,
+            ERC721BridgingType.LiquidityPool,
+          ),
         ).to.be.rejectedWith("ERC721Handler: zero receiver");
       });
     });
@@ -210,15 +237,39 @@ describe("ERC721Handler", () => {
 
     describe("withdraw", () => {
       it("should should check correct metadata (1)", async () => {
-        await handler.depositERC721(await tokenWithMetadata.getAddress(), baseId, "receiver", "kovan", true);
-        await handler.withdrawERC721(await tokenWithMetadata.getAddress(), baseId, OWNER, "123", true);
+        await handler.depositERC721(
+          await tokenWithMetadata.getAddress(),
+          baseId,
+          "receiver",
+          "kovan",
+          ERC721BridgingType.Wrapped,
+        );
+        await handler.withdrawERC721(
+          await tokenWithMetadata.getAddress(),
+          baseId,
+          OWNER,
+          "123",
+          ERC721BridgingType.Wrapped,
+        );
 
         expect(await tokenWithMetadata.tokenURI(baseId)).to.be.equal(tokenURI + "123");
       });
 
       it("should should check correct metadata (2)", async () => {
-        await handler.depositERC721(await tokenWithMetadata.getAddress(), baseId, "receiver", "kovan", true);
-        await handler.withdrawERC721(await tokenWithMetadata.getAddress(), baseId, OWNER, "", true);
+        await handler.depositERC721(
+          await tokenWithMetadata.getAddress(),
+          baseId,
+          "receiver",
+          "kovan",
+          ERC721BridgingType.Wrapped,
+        );
+        await handler.withdrawERC721(
+          await tokenWithMetadata.getAddress(),
+          baseId,
+          OWNER,
+          "",
+          ERC721BridgingType.Wrapped,
+        );
 
         expect(await tokenWithMetadata.tokenURI(baseId)).to.be.equal(tokenURI + baseId);
       });

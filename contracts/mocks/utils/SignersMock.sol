@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../../utils/Signers.sol";
+import {Signers} from "../../utils/Signers.sol";
 
 contract SignersMock is Signers {
     function __SignersMock_init(

@@ -3,6 +3,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 
 import "@typechain/hardhat";
 
+import "@solarity/hardhat-gobind";
 import "@solarity/hardhat-migrate";
 
 import "hardhat-contract-sizer";

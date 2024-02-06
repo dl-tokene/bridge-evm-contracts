@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../../handlers/ERC1155Handler.sol";
+import {ERC1155Handler} from "../../handlers/ERC1155Handler.sol";
 
 contract ERC1155HandlerMock is ERC1155Handler {
     function withdrawERC1155(
@@ -10,8 +10,8 @@ contract ERC1155HandlerMock is ERC1155Handler {
         uint256 amount_,
         address receiver_,
         string calldata tokenURI_,
-        bool isWrapped_
+        ERC1155BridgingType operationType_
     ) external {
-        _withdrawERC1155(token_, tokenId_, amount_, receiver_, tokenURI_, isWrapped_);
+        _withdrawERC1155(token_, tokenId_, amount_, receiver_, tokenURI_, operationType_);
     }
 }
