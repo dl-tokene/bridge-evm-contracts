@@ -1,9 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+/**
+ * @title IERC1155Handler
+ */
 interface IERC1155Handler {
     /**
-     * @notice event emits from depositERC1155 function
+     * @notice Enumerates the types of ERC1155 token bridging options.
+     */
+    enum ERC1155BridgingType {
+        LiquidityPool,
+        Wrapped
+    }
+
+    /**
+     * @dev Emitted when ERC1155 tokens are deposited for bridging.
+     * @param token The address of the ERC1155 token being bridged.
+     * @param tokenId The ID of the token deposited for bridging.
+     * @param amount The amount of tokens deposited for bridging.
+     * @param receiver The receiver's address in the destination network.
+     * @param network The name of the destination network.
+     * @param operationType The type of bridging operation performed.
      */
     event DepositedERC1155(
         address token,
@@ -11,17 +28,17 @@ interface IERC1155Handler {
         uint256 amount,
         string receiver,
         string network,
-        bool isWrapped
+        ERC1155BridgingType operationType
     );
 
     /**
-     * @notice function for depositing erc1155 tokens, emits event DepositedERC115
-     * @param token_ the address of deposited tokens
-     * @param tokenId_ the id of deposited tokens
-     * @param amount_ the amount of deposited tokens
-     * @param receiver_ the receiver address in destination network, information field for event
-     * @param network_ the network name of destination network, information field for event
-     * @param isWrapped_ the boolean flag, if true - tokens will burned, false - tokens will transferred
+     * @notice Deposits ERC1155 tokens for bridging, emitting a `DepositedERC1155` event.
+     * @param token_ The address of the deposited tokens.
+     * @param tokenId_ The ID of the deposited tokens.
+     * @param amount_ The amount of deposited tokens.
+     * @param receiver_ The receiver's address in the destination network, used as an informational field for the event.
+     * @param network_ The name of the destination network, used as an informational field for the event.
+     * @param operationType_ The type of bridging operation being performed.
      */
     function depositERC1155(
         address token_,
@@ -29,21 +46,22 @@ interface IERC1155Handler {
         uint256 amount_,
         string calldata receiver_,
         string calldata network_,
-        bool isWrapped_
+        ERC1155BridgingType operationType_
     ) external;
 
     /**
-     * @notice function for getting sign hash
-     * @param token_ the address of withdrawn token
-     * @param tokenId_ the id of deposited token
-     * @param amount_ the amount of withdrawn tokens
-     * @param receiver_ the receiver address in destination network
-     * @param txHash_ the hash of deposit tranaction
-     * @param txNonce_ the nonce of deposit transaction
-     * @param chainId_ the id of chain
-     * @param tokenURI_ the string URI to token metadata
-     * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
-     * @return bytes32 keccak256(abi.encodePacked(token_,tokenId_,amount_,receiver_,txHash_,txNonce_,chainId_,isWrapped_));
+     * @notice Generates a hash for signing, related to a specific ERC1155 bridging operation.
+     * @param token_ The address of the token being withdrawn.
+     * @param tokenId_ The ID of the deposited token.
+     * @param amount_ The amount of tokens being withdrawn.
+     * @param receiver_ The receiver's address in the destination network.
+     * @param txHash_ The hash of the deposit transaction.
+     * @param txNonce_ The nonce of the deposit transaction.
+     * @param chainId_ The ID of the chain where the operation is being performed.
+     * @param tokenURI_ The string URI to the token metadata.
+     * @param operationType_ The type of bridging operation.
+     * @return A `bytes32` hash, computed using `keccak256` of the encoded parameters:
+     *         keccak256(abi.encodePacked(token_,tokenId_,amount_,receiver_,txHash_,txNonce_,chainId_,tokenURI_,operationType_));
      */
     function getERC1155SignHash(
         address token_,
@@ -54,6 +72,6 @@ interface IERC1155Handler {
         uint256 txNonce_,
         uint256 chainId_,
         string calldata tokenURI_,
-        bool isWrapped_
+        ERC1155BridgingType operationType_
     ) external pure returns (bytes32);
 }

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 abstract contract Signers is OwnableUpgradeable {
     using ECDSA for bytes32;
@@ -21,32 +21,6 @@ abstract contract Signers is OwnableUpgradeable {
 
         addSigners(signers_);
         setSignaturesThreshold(signaturesThreshold_);
-    }
-
-    function _checkCorrectSigners(address[] memory signers_) private view {
-        uint256 bitMap;
-
-        for (uint256 i = 0; i < signers_.length; i++) {
-            require(_signers.contains(signers_[i]), "Signers: invalid signer");
-
-            uint256 bitKey = 2 ** (uint256(uint160(signers_[i])) >> 152);
-
-            require(bitMap & bitKey == 0, "Signers: duplicate signers");
-
-            bitMap |= bitKey;
-        }
-
-        require(signers_.length >= signaturesThreshold, "Signers: threshold is not met");
-    }
-
-    function _checkSignatures(bytes32 signHash_, bytes[] calldata signatures_) internal view {
-        address[] memory signers_ = new address[](signatures_.length);
-
-        for (uint256 i = 0; i < signatures_.length; i++) {
-            signers_[i] = signHash_.toEthSignedMessageHash().recover(signatures_[i]);
-        }
-
-        _checkCorrectSigners(signers_);
     }
 
     function setSignaturesThreshold(uint256 signaturesThreshold_) public onlyOwner {
@@ -71,5 +45,31 @@ abstract contract Signers is OwnableUpgradeable {
 
     function getSigners() external view returns (address[] memory) {
         return _signers.values();
+    }
+
+    function _checkSignatures(bytes32 signHash_, bytes[] calldata signatures_) internal view {
+        address[] memory signers_ = new address[](signatures_.length);
+
+        for (uint256 i = 0; i < signatures_.length; i++) {
+            signers_[i] = signHash_.toEthSignedMessageHash().recover(signatures_[i]);
+        }
+
+        _checkCorrectSigners(signers_);
+    }
+
+    function _checkCorrectSigners(address[] memory signers_) private view {
+        uint256 bitMap;
+
+        for (uint256 i = 0; i < signers_.length; i++) {
+            require(_signers.contains(signers_[i]), "Signers: invalid signer");
+
+            uint256 bitKey = 2 ** (uint256(uint160(signers_[i])) >> 152);
+
+            require(bitMap & bitKey == 0, "Signers: duplicate signers");
+
+            bitMap |= bitKey;
+        }
+
+        require(signers_.length >= signaturesThreshold, "Signers: threshold is not met");
     }
 }

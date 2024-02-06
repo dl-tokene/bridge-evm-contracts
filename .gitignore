@@ -11,3 +11,4 @@ coverage
 
 # Typechain generated files
 generated-types
+go-bindings

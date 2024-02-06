@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../../handlers/ERC721Handler.sol";
+import {ERC721Handler} from "../../handlers/ERC721Handler.sol";
 
 contract ERC721HandlerMock is ERC721Handler {
     function withdrawERC721(
@@ -9,8 +9,8 @@ contract ERC721HandlerMock is ERC721Handler {
         uint256 tokenId_,
         address receiver_,
         string calldata tokenURI_,
-        bool isWrapped_
+        ERC721BridgingType operationType_
     ) external {
-        _withdrawERC721(token_, tokenId_, receiver_, tokenURI_, isWrapped_);
+        _withdrawERC721(token_, tokenId_, receiver_, tokenURI_, operationType_);
     }
 }

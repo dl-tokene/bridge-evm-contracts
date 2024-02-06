@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 import { wei } from "@scripts";
-import { getSignature, Reverter } from "@test-helpers";
+import { ERC20BridgingType, getSignature, Reverter } from "@test-helpers";
 
 import { ERC20MintableBurnable, Bridge, ERC721MintableBurnable, ERC1155MintableBurnable } from "@ethers-v6";
 
@@ -85,7 +85,7 @@ describe("Bridge", () => {
   describe("ERC20 flow", () => {
     it("should withdrawERC20", async () => {
       const expectedAmount = wei("100");
-      const expectedIsWrapped = true;
+      const expectedOperationType = ERC20BridgingType.Wrapped;
 
       const signHash = await bridge.getERC20SignHash(
         await erc20.getAddress(),
@@ -94,14 +94,20 @@ describe("Bridge", () => {
         txHash,
         txNonce,
         (await ethers.provider.getNetwork()).chainId,
-        expectedIsWrapped,
+        expectedOperationType,
       );
       const signature = await getSignature(OWNER, signHash);
 
-      await bridge.depositERC20(await erc20.getAddress(), expectedAmount, "receiver", "kovan", true);
-      await bridge.withdrawERC20(await erc20.getAddress(), expectedAmount, OWNER, txHash, txNonce, expectedIsWrapped, [
-        signature,
-      ]);
+      await bridge.depositERC20(await erc20.getAddress(), expectedAmount, "receiver", "kovan", expectedOperationType);
+      await bridge.withdrawERC20(
+        await erc20.getAddress(),
+        expectedAmount,
+        OWNER,
+        txHash,
+        txNonce,
+        expectedOperationType,
+        [signature],
+      );
 
       expect(await erc20.balanceOf(OWNER)).to.equal(baseBalance);
       expect(await erc20.balanceOf(await bridge.getAddress())).to.equal(0);
@@ -112,7 +118,7 @@ describe("Bridge", () => {
 
   describe("ERC721 flow", () => {
     it("should withdrawERC721", async () => {
-      const expectedIsWrapped = true;
+      const expectedOperationType = ERC20BridgingType.Wrapped;
 
       const signHash = await bridge.getERC721SignHash(
         await erc721.getAddress(),
@@ -122,11 +128,11 @@ describe("Bridge", () => {
         txNonce,
         (await ethers.provider.getNetwork()).chainId,
         tokenURI,
-        expectedIsWrapped,
+        expectedOperationType,
       );
       const signature = await getSignature(OWNER, signHash);
 
-      await bridge.depositERC721(await erc721.getAddress(), baseId, "receiver", "kovan", expectedIsWrapped);
+      await bridge.depositERC721(await erc721.getAddress(), baseId, "receiver", "kovan", expectedOperationType);
       await bridge.withdrawERC721(
         await erc721.getAddress(),
         baseId,
@@ -134,7 +140,7 @@ describe("Bridge", () => {
         txHash,
         txNonce,
         tokenURI,
-        expectedIsWrapped,
+        expectedOperationType,
         [signature],
       );
 
@@ -145,7 +151,7 @@ describe("Bridge", () => {
 
   describe("ERC1155 flow", () => {
     it("should withdrawERC1155", async () => {
-      const expectedIsWrapped = true;
+      const expectedOperationType = ERC20BridgingType.Wrapped;
 
       const signHash = await bridge.getERC1155SignHash(
         await erc1155.getAddress(),
@@ -156,7 +162,7 @@ describe("Bridge", () => {
         txNonce,
         (await ethers.provider.getNetwork()).chainId,
         tokenURI,
-        expectedIsWrapped,
+        expectedOperationType,
       );
       const signature = await getSignature(OWNER, signHash);
 
@@ -166,7 +172,7 @@ describe("Bridge", () => {
         baseBalance,
         "receiver",
         "kovan",
-        expectedIsWrapped,
+        expectedOperationType,
       );
       await bridge.withdrawERC1155(
         await erc1155.getAddress(),
@@ -176,7 +182,7 @@ describe("Bridge", () => {
         txHash,
         txNonce,
         tokenURI,
-        expectedIsWrapped,
+        expectedOperationType,
         [signature],
       );
 

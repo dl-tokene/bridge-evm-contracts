@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../interfaces/handlers/INativeHandler.sol";
+import {INativeHandler} from "../interfaces/handlers/INativeHandler.sol";
 
+/**
+ * @title NativeHandler
+ */
 abstract contract NativeHandler is INativeHandler {
+    receive() external payable {}
+
+    /**
+     * @inheritdoc INativeHandler
+     */
     function depositNative(
         string calldata receiver_,
         string calldata network_
@@ -12,8 +20,6 @@ abstract contract NativeHandler is INativeHandler {
 
         emit DepositedNative(msg.value, receiver_, network_);
     }
-
-    receive() external payable {}
 
     function _withdrawNative(uint256 amount_, address receiver_) internal {
         require(amount_ > 0, "NativeHandler: amount is zero");
@@ -24,6 +30,9 @@ abstract contract NativeHandler is INativeHandler {
         require(sent_, "NativeHandler: can't send eth");
     }
 
+    /**
+     * @inheritdoc INativeHandler
+     */
     function getNativeSignHash(
         uint256 amount_,
         address receiver_,
