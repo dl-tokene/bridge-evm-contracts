@@ -4,11 +4,10 @@ pragma solidity ^0.8.9;
 import "../interfaces/handlers/INativeHandler.sol";
 
 abstract contract NativeHandler is INativeHandler {
-    function depositNative(string calldata receiver_, string calldata network_)
-        external
-        payable
-        override
-    {
+    function depositNative(
+        string calldata receiver_,
+        string calldata network_
+    ) external payable override {
         require(msg.value > 0, "NativeHandler: zero value");
 
         emit DepositedNative(msg.value, receiver_, network_);

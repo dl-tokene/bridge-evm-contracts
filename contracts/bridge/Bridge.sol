@@ -23,10 +23,10 @@ contract Bridge is
     ERC1155Handler,
     NativeHandler
 {
-    function __Bridge_init(address[] calldata signers_, uint256 signaturesThreshold_)
-        external
-        initializer
-    {
+    function __Bridge_init(
+        address[] calldata signers_,
+        uint256 signaturesThreshold_
+    ) external initializer {
         __Signers_init(signers_, signaturesThreshold_);
     }
 

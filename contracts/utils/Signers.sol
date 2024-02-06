@@ -13,10 +13,10 @@ abstract contract Signers is OwnableUpgradeable {
 
     EnumerableSet.AddressSet internal _signers;
 
-    function __Signers_init(address[] calldata signers_, uint256 signaturesThreshold_)
-        public
-        onlyInitializing
-    {
+    function __Signers_init(
+        address[] calldata signers_,
+        uint256 signaturesThreshold_
+    ) public onlyInitializing {
         __Ownable_init();
 
         addSigners(signers_);
@@ -29,7 +29,7 @@ abstract contract Signers is OwnableUpgradeable {
         for (uint256 i = 0; i < signers_.length; i++) {
             require(_signers.contains(signers_[i]), "Signers: invalid signer");
 
-            uint256 bitKey = 2**(uint256(uint160(signers_[i])) >> 152);
+            uint256 bitKey = 2 ** (uint256(uint160(signers_[i])) >> 152);
 
             require(bitMap & bitKey == 0, "Signers: duplicate signers");
 

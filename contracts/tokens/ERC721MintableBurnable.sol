@@ -48,21 +48,15 @@ contract ERC721MintableBurnable is
         _burn(tokenId_);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721URIStorage, ERC721)
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(ERC721URIStorage, ERC721) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721Enumerable, ERC721, IERC165)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721Enumerable, ERC721, IERC165) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

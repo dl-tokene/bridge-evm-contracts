@@ -4,10 +4,10 @@ pragma solidity ^0.8.9;
 import "../../utils/Signers.sol";
 
 contract SignersMock is Signers {
-    function __SignersMock_init(address[] calldata signers_, uint256 signaturesThreshold_)
-        public
-        initializer
-    {
+    function __SignersMock_init(
+        address[] calldata signers_,
+        uint256 signaturesThreshold_
+    ) public initializer {
         __Signers_init(signers_, signaturesThreshold_);
     }
 

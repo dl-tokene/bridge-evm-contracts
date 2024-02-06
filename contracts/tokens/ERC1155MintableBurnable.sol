@@ -52,12 +52,9 @@ contract ERC1155MintableBurnable is
         _burn(payer_, tokenId_, amount_);
     }
 
-    function uri(uint256 tokenId)
-        public
-        view
-        override(ERC1155URIStorage, ERC1155)
-        returns (string memory)
-    {
+    function uri(
+        uint256 tokenId
+    ) public view override(ERC1155URIStorage, ERC1155) returns (string memory) {
         return super.uri(tokenId);
     }
 

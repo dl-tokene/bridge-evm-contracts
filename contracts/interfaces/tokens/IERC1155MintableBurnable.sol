@@ -11,9 +11,5 @@ interface IERC1155MintableBurnable is IERC1155 {
         string calldata tokenURI_
     ) external;
 
-    function burnFrom(
-        address payer_,
-        uint256 tokenId_,
-        uint256 amount_
-    ) external;
+    function burnFrom(address payer_, uint256 tokenId_, uint256 amount_) external;
 }
