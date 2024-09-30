@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+/**
+ * @title INativeHandler
+ */
 interface INativeHandler {
     /**
      * @notice event emits from depositNative function

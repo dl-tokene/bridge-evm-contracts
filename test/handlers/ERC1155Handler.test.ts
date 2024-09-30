@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
-import { Reverter } from "@test-helpers";
+import { ERC1155BridgingType, Reverter } from "@test-helpers";
 
 import { ERC1155HandlerMock, ERC1155MintableBurnable } from "@ethers-v6";
 
@@ -40,8 +40,15 @@ describe("ERC1155Handler", () => {
 
   describe("ERC1155 no base uri", () => {
     describe("depositERC1155", () => {
-      it("should deposit token, isWrapped = true", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", true);
+      it("should deposit token, operationType = Wrapped", async () => {
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.Wrapped,
+        );
 
         expect(await token.balanceOf(OWNER, baseId)).to.equal("0");
 
@@ -53,39 +60,67 @@ describe("ERC1155Handler", () => {
         expect(depositEvent.args.amount).to.be.equal(baseAmount);
         expect(depositEvent.args.receiver).to.be.equal("receiver");
         expect(depositEvent.args.network).to.be.equal("kovan");
-        expect(depositEvent.args.isWrapped).to.be.true;
+        expect(depositEvent.args.operationType).to.be.equal(ERC1155BridgingType.Wrapped);
       });
 
       it("should not burn tokens if they are not approved", async () => {
         await token.setApprovalForAll(await handler.getAddress(), false);
 
         await expect(
-          handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", true),
+          handler.depositERC1155(
+            await token.getAddress(),
+            baseId,
+            baseAmount,
+            "receiver",
+            "kovan",
+            ERC1155BridgingType.Wrapped,
+          ),
         ).to.be.rejectedWith("ERC1155MintableBurnable: not approved");
       });
 
-      it("should deposit token, isWrapped = false", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", false);
+      it("should deposit token, operationType = LiquidityPool", async () => {
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.LiquidityPool,
+        );
 
         expect(await token.balanceOf(OWNER, baseId)).to.equal("0");
         expect(await token.balanceOf(await handler.getAddress(), baseId)).to.equal(baseAmount);
 
         const depositEvent = (await handler.queryFilter(handler.filters.DepositedERC1155, -1))[0];
 
-        expect(depositEvent.args.isWrapped).to.be.false;
+        expect(depositEvent.args.operationType).to.be.equal(ERC1155BridgingType.LiquidityPool);
 
         expect(await token.uri(baseId)).to.be.equal(tokenURI);
       });
 
       it("should revert when token address is 0", async () => {
         await expect(
-          handler.depositERC1155(ethers.ZeroAddress, baseId, baseAmount, "receiver", "kovan", false),
+          handler.depositERC1155(
+            ethers.ZeroAddress,
+            baseId,
+            baseAmount,
+            "receiver",
+            "kovan",
+            ERC1155BridgingType.LiquidityPool,
+          ),
         ).to.be.rejectedWith("ERC1155Handler: zero token");
       });
 
       it("should revert when try deposit 0 tokens", async () => {
         await expect(
-          handler.depositERC1155(await token.getAddress(), baseId, "0", "receiver", "kovan", false),
+          handler.depositERC1155(
+            await token.getAddress(),
+            baseId,
+            "0",
+            "receiver",
+            "kovan",
+            ERC1155BridgingType.LiquidityPool,
+          ),
         ).to.be.rejectedWith("ERC1155Handler: amount is zero");
       });
     });
@@ -95,7 +130,7 @@ describe("ERC1155Handler", () => {
         let expectedTxHash = "0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d";
         let expectedNonce = "1794147";
         let expectedChainId = 31378;
-        let expectedIsWrapped = true;
+        let expectedOperationType = ERC1155BridgingType.Wrapped;
 
         let signHash0 = await handler.getERC1155SignHash(
           await token.getAddress(),
@@ -106,13 +141,13 @@ describe("ERC1155Handler", () => {
           expectedNonce,
           expectedChainId,
           tokenURI,
-          expectedIsWrapped,
+          expectedOperationType,
         );
 
         expect(signHash0).to.be.equal(
           ethers.keccak256(
             ethers.solidityPacked(
-              ["address", "uint256", "uint256", "address", "bytes32", "uint256", "uint256", "string", "bool"],
+              ["address", "uint256", "uint256", "address", "bytes32", "uint256", "uint256", "string", "uint8"],
               [
                 await token.getAddress(),
                 baseId,
@@ -122,13 +157,13 @@ describe("ERC1155Handler", () => {
                 expectedNonce,
                 expectedChainId,
                 tokenURI,
-                expectedIsWrapped,
+                expectedOperationType,
               ],
             ),
           ),
         );
 
-        expectedIsWrapped = false;
+        expectedOperationType = ERC1155BridgingType.LiquidityPool;
 
         let signHash1 = await handler.getERC1155SignHash(
           await token.getAddress(),
@@ -139,13 +174,13 @@ describe("ERC1155Handler", () => {
           expectedNonce,
           expectedChainId,
           tokenURI,
-          expectedIsWrapped,
+          expectedOperationType,
         );
 
         expect(signHash1).to.be.equal(
           ethers.keccak256(
             ethers.solidityPacked(
-              ["address", "uint256", "uint256", "address", "bytes32", "uint256", "uint256", "string", "bool"],
+              ["address", "uint256", "uint256", "address", "bytes32", "uint256", "uint256", "string", "uint8"],
               [
                 await token.getAddress(),
                 baseId,
@@ -155,7 +190,7 @@ describe("ERC1155Handler", () => {
                 expectedNonce,
                 expectedChainId,
                 tokenURI,
-                expectedIsWrapped,
+                expectedOperationType,
               ],
             ),
           ),
@@ -166,18 +201,46 @@ describe("ERC1155Handler", () => {
     });
 
     describe("withdrawERC1155", () => {
-      it("should withdraw 100 tokens, wrapped = true", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", true);
-        await handler.withdrawERC1155(await token.getAddress(), baseId, baseAmount, OWNER, tokenURI, true);
+      it("should withdraw 100 tokens, operationType = Wrapped", async () => {
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.Wrapped,
+        );
+        await handler.withdrawERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          OWNER,
+          tokenURI,
+          ERC1155BridgingType.Wrapped,
+        );
 
         expect(await token.balanceOf(OWNER, baseId)).to.equal(baseAmount);
         expect(await token.balanceOf(await handler.getAddress(), baseId)).to.equal("0");
         expect(await token.uri(baseId)).to.equal(tokenURI);
       });
 
-      it("should withdraw 52 tokens, wrapped = false", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", false);
-        await handler.withdrawERC1155(await token.getAddress(), baseId, baseAmount, OWNER, tokenURI, false);
+      it("should withdraw 52 tokens, operationType = LiquidityPool", async () => {
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.LiquidityPool,
+        );
+        await handler.withdrawERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          OWNER,
+          tokenURI,
+          ERC1155BridgingType.LiquidityPool,
+        );
 
         expect(await token.balanceOf(OWNER, baseId)).to.equal(baseAmount);
         expect(await token.balanceOf(await handler.getAddress(), baseId)).to.equal("0");
@@ -185,19 +248,26 @@ describe("ERC1155Handler", () => {
 
       it("should revert when token address is 0", async () => {
         await expect(
-          handler.withdrawERC1155(ethers.ZeroAddress, baseId, baseAmount, OWNER, tokenURI, true),
+          handler.withdrawERC1155(ethers.ZeroAddress, baseId, baseAmount, OWNER, tokenURI, ERC1155BridgingType.Wrapped),
         ).to.be.rejectedWith("ERC1155Handler: zero token");
       });
 
       it("should revert when amount is 0", async () => {
         await expect(
-          handler.withdrawERC1155(await token.getAddress(), baseId, "0", OWNER, tokenURI, true),
+          handler.withdrawERC1155(await token.getAddress(), baseId, "0", OWNER, tokenURI, ERC1155BridgingType.Wrapped),
         ).to.be.rejectedWith("ERC1155Handler: amount is zero");
       });
 
       it("should revert when receiver address is 0", async () => {
         await expect(
-          handler.withdrawERC1155(await token.getAddress(), baseId, baseAmount, ethers.ZeroAddress, tokenURI, true),
+          handler.withdrawERC1155(
+            await token.getAddress(),
+            baseId,
+            baseAmount,
+            ethers.ZeroAddress,
+            tokenURI,
+            ERC1155BridgingType.Wrapped,
+          ),
         ).to.be.rejectedWith("ERC1155Handler: zero receiver");
       });
     });
@@ -216,15 +286,43 @@ describe("ERC1155Handler", () => {
 
     describe("withdraw", () => {
       it("should should check correct metadata (1)", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", true);
-        await handler.withdrawERC1155(await token.getAddress(), baseId, baseAmount, OWNER, "123", true);
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.Wrapped,
+        );
+        await handler.withdrawERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          OWNER,
+          "123",
+          ERC1155BridgingType.Wrapped,
+        );
 
         expect(await token.uri(baseId)).to.be.equal(tokenURI + "123");
       });
 
       it("should should check correct metadata (2)", async () => {
-        await handler.depositERC1155(await token.getAddress(), baseId, baseAmount, "receiver", "kovan", true);
-        await handler.withdrawERC1155(await token.getAddress(), baseId, baseAmount, OWNER, "", true);
+        await handler.depositERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          "receiver",
+          "kovan",
+          ERC1155BridgingType.Wrapped,
+        );
+        await handler.withdrawERC1155(
+          await token.getAddress(),
+          baseId,
+          baseAmount,
+          OWNER,
+          "",
+          ERC1155BridgingType.Wrapped,
+        );
 
         expect(await token.uri(baseId)).to.be.equal(tokenURI);
       });

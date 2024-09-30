@@ -1,45 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+/**
+ * @title IERC721Handler
+ */
 interface IERC721Handler {
     /**
-     * @notice event emits from depositERC721 function
+     * @notice Enumerates the types of ERC721 token bridging options.
+     */
+    enum ERC721BridgingType {
+        LiquidityPool,
+        Wrapped
+    }
+
+    /**
+     * @dev Emitted when ERC721 tokens are deposited for bridging.
+     * @param token The address of the ERC721 token being bridged.
+     * @param tokenId The ID of the token deposited for bridging.
+     * @param receiver The receiver's address in the destination network.
+     * @param network The name of the destination network.
+     * @param operationType The type of bridging operation performed.
      */
     event DepositedERC721(
         address token,
         uint256 tokenId,
         string receiver,
         string network,
-        bool isWrapped
+        ERC721BridgingType operationType
     );
 
     /**
-     * @notice function for depositing erc721 tokens, emits event DepositedERC721
-     * @param token_ the address of deposited token
-     * @param tokenId_ the id of deposited token
-     * @param receiver_ the receiver address in destination network, information field for event
-     * @param network_ the network name of destination network, information field for event
-     * @param isWrapped_ the boolean flag, if true - token will burned, false - token will transferred
+     * @notice Deposits ERC721 tokens for bridging, emitting a `DepositedERC721` event.
+     * @param token_ The address of the deposited token.
+     * @param tokenId_ The ID of the deposited token.
+     * @param receiver_ The receiver's address in the destination network, used as an informational field for the event.
+     * @param network_ The name of the destination network, used as an informational field for the event.
+     * @param operationType_ The type of bridging operation being performed.
      */
     function depositERC721(
         address token_,
         uint256 tokenId_,
         string calldata receiver_,
         string calldata network_,
-        bool isWrapped_
+        ERC721BridgingType operationType_
     ) external;
 
     /**
-     * @notice function for getting sign hash
-     * @param token_ the address of withdrawn token
-     * @param tokenId_ the id of deposited token
-     * @param receiver_ the receiver address in destination network
-     * @param txHash_ the hash of deposit tranaction
-     * @param txNonce_ the nonce of deposit transaction
-     * @param chainId_ the id of chain
-     * @param tokenURI_ the string URI to token metadata
-     * @param isWrapped_ the boolean flag, if true - tokens will minted, false - tokens will transferred
-     * @return bytes32 keccak256(abi.encodePacked(token_,tokenId_,receiver_,txHash_,txNonce_,chainId_,isWrapped_));
+     * @notice Generates a hash for signing, related to a specific ERC721 bridging operation.
+     * @param token_ The address of the token being withdrawn.
+     * @param tokenId_ The ID of the deposited token.
+     * @param receiver_ The receiver's address in the destination network.
+     * @param txHash_ The hash of the deposit transaction.
+     * @param txNonce_ The nonce of the deposit transaction.
+     * @param chainId_ The ID of the chain where the operation is being performed.
+     * @param tokenURI_ The string URI to the token metadata.
+     * @param operationType_ The type of bridging operation.
+     * @return A `bytes32` hash, computed using `keccak256` of the encoded parameters:
+     *         keccak256(abi.encodePacked(token_,tokenId_,receiver_,txHash_,txNonce_,chainId_,tokenURI_,operationType_));
      */
     function getERC721SignHash(
         address token_,
@@ -49,6 +66,6 @@ interface IERC721Handler {
         uint256 txNonce_,
         uint256 chainId_,
         string calldata tokenURI_,
-        bool isWrapped_
+        ERC721BridgingType operationType_
     ) external pure returns (bytes32);
 }
