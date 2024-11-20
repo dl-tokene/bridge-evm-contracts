@@ -11,7 +11,7 @@
       "@/*": ["./*"],
       "@ethers-v6": ["./generated-types"],
       "@test-helpers": ["./test/helpers"],
-      "@scripts": ["./scripts"],
-    },
-  },
+      "@scripts": ["./scripts"]
+    }
+  }
 }

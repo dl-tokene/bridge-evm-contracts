@@ -31,8 +31,13 @@ describe("Bridge", () => {
     [OWNER, SECOND] = await ethers.getSigners();
 
     const Bridge = await ethers.getContractFactory("Bridge");
-
     bridge = await Bridge.deploy();
+
+    const Proxy = await ethers.getContractFactory("ERC1967Proxy");
+    const proxy = await Proxy.deploy(await bridge.getAddress(), "0x");
+
+    bridge = await ethers.getContractAt("Bridge", await proxy.getAddress());
+
     await bridge.__Bridge_init([OWNER.address], "1");
 
     const ERC20MB = await ethers.getContractFactory("ERC20MintableBurnable");
